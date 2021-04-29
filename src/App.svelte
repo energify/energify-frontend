@@ -1,30 +1,49 @@
 <script lang="ts">
-	export let name: string;
+  import { Chart, registerables } from "chart.js";
+  import { onMount } from "svelte";
+  import Router from "svelte-spa-router";
+  import authRoutes from "./auth/auth.routes";
+  import tradingRoutes from "./trading/trading.routes";
+  import walletRoutes from "./wallet/wallet.routes";
+
+  onMount(() => {
+    Chart.register(...registerables);
+  });
 </script>
 
-<main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
-</main>
+<div>
+  <Router routes={{ ...authRoutes, ...tradingRoutes, ...walletRoutes }} />
+</div>
 
-<style>
-	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
-	}
+<style global lang="postcss">
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
 
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
+  .input {
+    @apply appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md 
+      shadow-sm placeholder-gray-400;
+  }
 
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
-	}
+  .input:focus {
+    @apply outline-none ring-green-500 border-green-500;
+  }
+
+  .btn {
+    @apply py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white 
+    bg-green-600;
+  }
+
+  .btn-secundary {
+    @apply py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-gray-800 
+    bg-gray-200;
+  }
+
+  .btn:hover {
+    @apply bg-green-700;
+  }
+
+  .btn:focus {
+    @apply outline-none ring-2 ring-offset-2 ring-green-500;
+  }
 </style>

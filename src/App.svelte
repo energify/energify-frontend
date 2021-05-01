@@ -3,6 +3,7 @@
   import { onMount } from "svelte";
   import Router from "svelte-spa-router";
   import authRoutes from "./auth/auth.routes";
+  import dashboardRoutes from "./dashboard/dashboard.routes";
   import tradingRoutes from "./trading/trading.routes";
   import walletRoutes from "./wallet/wallet.routes";
 
@@ -12,7 +13,7 @@
 </script>
 
 <div>
-  <Router routes={{ ...authRoutes, ...tradingRoutes, ...walletRoutes }} />
+  <Router routes={{ ...authRoutes, ...tradingRoutes, ...walletRoutes, ...dashboardRoutes }} />
 </div>
 
 <style global lang="postcss">

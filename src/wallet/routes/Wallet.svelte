@@ -6,7 +6,7 @@
 </script>
 
 <Shell title="Wallet">
-  <div class="grid grid-cols-12 gap-8">
+  <div class="grid grid-cols-12 gap-12">
     <div class="flex flex-col col-span-12 lg:col-span-4">
       <div class="mb-8">
         <WalletBalance />

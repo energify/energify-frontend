@@ -1,6 +1,13 @@
 import { get, writable } from "svelte/store";
 import { request } from "../common/api.util";
-import type { User, LoginDto, LoginResponse, RegisterDto } from "./auth.interfaces";
+import {
+  User,
+  LoginDto,
+  LoginResponse,
+  RegisterDto,
+  Roles,
+  CompleteAccountDto,
+} from "./auth.interfaces";
 
 export class AuthService {
   user = writable({} as User);
@@ -10,8 +17,16 @@ export class AuthService {
     localStorage.setItem("token", data.accessToken);
   }
 
+  logout() {
+    localStorage.removeItem("token");
+  }
+
   async register(dto: RegisterDto) {
     return request("/users/register", "POST", dto);
+  }
+
+  async complete(dto: CompleteAccountDto) {
+    return request("/users/complete", "PUT", dto);
   }
 
   async details() {
@@ -27,11 +42,14 @@ export class AuthService {
       if (!get(this.user).email) {
         const { data } = await this.details();
         this.user.set(data);
-        console.log(this.user);
       }
       return true;
     } catch (e) {
       return false;
     }
+  }
+
+  isAccountComplete() {
+    return get(this.user).role !== Roles.Unverified;
   }
 }

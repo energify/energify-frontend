@@ -1,5 +1,5 @@
 import { wrap } from "svelte-spa-router/wrap";
-import { authService } from "../main";
+import { authService } from "../common/services/services.injector";
 import Wallet from "./routes/Wallet.svelte";
 
 export default {

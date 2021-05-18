@@ -1,21 +1,27 @@
 <script>
   import Card from "../../common/components/card/Card.svelte";
   import Icon, { ArrowUp } from "svelte-hero-icons";
+  import Badge from "../../common/components/badge/Badge.svelte";
+  import { transactionsService } from "../../common/services/services.injector";
 </script>
 
-<Card>
+<Card bgColor="bg-gray-900">
   <div class="flex justify-between items-center">
     <div class="flex flex-col">
-      <span class="text-2xl font-semibold">
-        $1.18 <span class="text-sm text-gray-500 font-normal"> / kWh</span>
+      <span class="text-2xl font-semibold text-gray-50">
+        {#await transactionsService.fetchPriceLast24Hours()}
+          ...
+        {:then { data }}
+          ${data} <span class="text-sm text-gray-400 font-normal"> / kWh</span>
+        {/await}
       </span>
-      <span class="text-md text-gray-500">Last 24 hours</span>
+      <span class="text-sm text-gray-400">Last 24 hours</span>
     </div>
     <div>
-      <span class="flex bg-green-100 text-green-800 px-2 rounded-full font-semibold items-center">
-        <Icon src={ArrowUp} class="w-4 h-4 text-green-500 mr-2" solid />
+      <Badge color="green" isDarkMode>
+        <Icon src={ArrowUp} class="w-4 h-4 text-green-400 mr-1" solid />
         3.53%
-      </span>
+      </Badge>
     </div>
   </div>
 </Card>

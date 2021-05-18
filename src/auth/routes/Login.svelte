@@ -1,14 +1,13 @@
 <script lang="ts">
   import { push } from "svelte-spa-router";
-  import { authService } from "../../main";
+  import { authService } from "../../common/services/services.injector";
 
-  export let email: string = "";
-  export let password: string = "";
+  let loginFormData = { email: "", password: "" };
 
   async function handleLogin() {
     try {
-      await authService.login({ email, password });
-      push("#/trading");
+      await authService.login(loginFormData);
+      push("/");
     } catch {}
   }
 </script>
@@ -32,7 +31,7 @@
               type="email"
               required
               class="input"
-              bind:value={email}
+              bind:value={loginFormData.email}
             />
           </div>
         </div>
@@ -46,7 +45,7 @@
               type="password"
               required
               class="input"
-              bind:value={password}
+              bind:value={loginFormData.password}
             />
           </div>
         </div>

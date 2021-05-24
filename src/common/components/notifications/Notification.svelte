@@ -15,6 +15,7 @@
   onMount(() => {
     isMounted = true;
     setTimeout(() => (isRendered = true), 100);
+    setTimeout(() => handleClose(), 4000);
   });
 
   let isMounted = false;

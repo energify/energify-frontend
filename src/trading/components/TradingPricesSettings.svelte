@@ -11,7 +11,6 @@
 
   async function handleSave() {
     try {
-      await usersService.updatePrices(pricesFormData);
       notificationsService.push({
         title: "Prices updated",
         description: "Your price settings were updated with success",

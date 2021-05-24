@@ -7,17 +7,17 @@ import { authService } from "../common/services/services.injector";
 export default {
   "/auth/login": wrap({
     component: Login,
-    conditions: [async () => !(await authService.isLoggedIn())],
+    //conditions: [async () => !(await authService.isLoggedIn())],
   }),
   "/auth/register": wrap({
     component: Register,
-    conditions: [async () => !(await authService.isLoggedIn())],
+    //conditions: [async () => !(await authService.isLoggedIn())],
   }),
   "/auth/complete": wrap({
     component: Complete,
-    conditions: [
+    /*conditions: [
       async () => await authService.isLoggedIn(),
       () => !authService.isAccountComplete(),
-    ],
+    ],*/
   }),
 };

@@ -5,6 +5,6 @@ import Dashboard from "./routes/Dashboard.svelte";
 export default {
   "/": wrap({
     component: Dashboard,
-    conditions: [async () => await authService.isLoggedIn()],
+    //conditions: [async () => await authService.isLoggedIn()],
   }),
 };

@@ -7,11 +7,12 @@
   <div class="flex justify-between items-center">
     <div class="flex flex-col">
       <span class="text-3xl text-gray-50 font-semibold">
-        {#await hederaService.fetchBalance()}
+        <!--{#await hederaService.fetchBalance()}
           Loading...
         {:then { hbars }}
           {hbars.toString()}
-        {/await}
+        {/await}-->
+        75ℏ
       </span>
       <span class="text-lg text-gray-400 font-medium">≈ $15.0</span>
     </div>

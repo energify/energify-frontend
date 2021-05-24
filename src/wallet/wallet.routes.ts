@@ -5,6 +5,6 @@ import Wallet from "./routes/Wallet.svelte";
 export default {
   "/wallet": wrap({
     component: Wallet,
-    conditions: [async () => await authService.isLoggedIn()],
+    //conditions: [async () => await authService.isLoggedIn()],
   }),
 };

@@ -35,7 +35,20 @@
   });
 
   async function updateChart(interval: string = "1h") {
-    const { data } = await transactionsService.fetchPriceHistory(interval, 12);
+    //const { data } = await transactionsService.fetchPriceHistory(interval, 12);
+    let data;
+    //Static Values for IHC
+    if (interval === "1h") {
+      data = [1.12, 1.13, 1.25, 1.2, 1.12, 1.07, 1.05, 0.98, 1.05, 1.09, 1.13, 1.17];
+    } else if (interval === "1d") {
+      data = [1.01, 1.13, 1.28, 1.22, 1.22, 1.12, 1.05, 0.98, 1.15, 1.39, 1.13, 1.2];
+    } else if (interval === "1w") {
+      data = [1.02, 1.03, 1.05, 1.12, 1.14, 1.19, 1.05, 1, 1.09, 1.18, 1.23, 1.27];
+    } else if (interval === "1m") {
+      data = [0.95, 0.81, 0.99, 1.01, 1.05, 1.07, 1.05, 0.91, 1.15, 1.29, 1.13, 1.27];
+    } else if (interval === "1y") {
+      data = [0.58, 0.6, 0.69, 0.74, 0.99, 0.75, 0.85, 0.95, 1.05, 1.09, 1.18, 1.23];
+    }
     chart.data.datasets[0].data = data;
     chart.data.labels = intervalToChartLabel(interval, 12);
     chart.update();

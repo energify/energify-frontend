@@ -1,5 +1,6 @@
 <script>
   import { formatDistanceToNow } from "date-fns";
+  import { onMount } from "svelte";
   import Badge from "../../common/components/badge/Badge.svelte";
   import Table from "../../common/components/table/Table.svelte";
   import TableNotFound from "../../common/components/table/TableNotFound.svelte";
@@ -8,11 +9,26 @@
   import WalletPaymentsFilter from "./WalletPaymentsFilter.svelte";
 
   const { user } = authService;
+  let payments = paymentsService.fetchPayments();
+  const userId = 10;
+
+  function handleFilterPayments(type, minPrice, maxPrice, date) {
+    if (type === "buy") {
+      payments.data = payments.data?.filter((p) => (p.consumerId = userId));
+    } else if (type === "sell") {
+      payments.data = payments.data?.filter((p) => (p.prosumerId = userId));
+      console.log(payments);
+    } else {
+      payments = paymentsService.fetchPayments();
+    }
+  }
+
+  function updatePayments() {}
 </script>
 
 <div class="flex items-center justify-between mb-6">
   <h3 class="text-gray-900 text-xl font-semibold">Latest Payments</h3>
-  <WalletPaymentsFilter />
+  <WalletPaymentsFilter onFiltered={handleFilterPayments} />
 </div>
 
 <Table headers={["Amount", "Price", "Date", "Explore", "Invoice"]}>
@@ -29,7 +45,7 @@
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="flex items-center">
-            {#if payment.consumerId === $user.id}
+            {#if payment.consumerId === userId}
               <Badge color="red">${payment.amount.toFixed(2)}</Badge>
             {:else}
               <Badge color="green">${payment.amount.toFixed(2)}</Badge>

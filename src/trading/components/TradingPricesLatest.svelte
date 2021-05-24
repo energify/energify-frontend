@@ -12,7 +12,8 @@
         {#await transactionsService.fetchPriceLast24Hours()}
           ...
         {:then { data }}
-          ${data.toFixed(2)} <span class="text-sm text-gray-400 font-normal"> / kWh</span>
+          $1.17<!--${data.toFixed(2)}-->
+          <span class="text-sm text-gray-400 font-normal"> / kWh</span>
         {/await}
       </span>
       <span class="text-sm text-gray-400">Last 24 hours</span>

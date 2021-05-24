@@ -3,7 +3,9 @@ export const energyFlowOptions = {
   maintainAspectRatio: false,
   plugins: {
     legend: { display: false },
-    tooltip: { enabled: true },
+    tooltip: {
+      enabled: true,
+    },
   },
   scales: {
     x: {

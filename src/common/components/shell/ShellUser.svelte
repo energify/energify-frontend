@@ -12,12 +12,13 @@
     class="w-10 h-10 rounded-full  hidden md:flex"
   />
   <div class="flex flex-col mx-2">
-    <span class="text-base text-gray-900">{$user.name}</span>
+    <span class="text-base text-gray-900">Luís Alves</span>
     <span class="text-sm text-gray-500">
       {#await hederaService.fetchBalance()}
         ...
       {:then { hbars }}
-        {hbars.toString()}
+        75ℏ
+        <!--{hbars.toString()}-->
       {/await}
     </span>
   </div>

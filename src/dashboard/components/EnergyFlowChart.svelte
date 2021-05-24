@@ -26,12 +26,18 @@
   async function updateChart() {
     const start = new Date(startDate ?? new Date());
     const end = new Date(endDate ?? subDays(start, 1));
-    const { data: chatInData } = await transactionsService.fetchEnergyFlow(start, end);
+    const { data: chartInData } = await transactionsService.fetchEnergyFlow(start, end);
     const { energyFromCommunity, energyFromPublicGrid, energyToCommunity, energyToPublicGrid } =
-      chatInData;
-    chartIn.data.datasets[0].data = [energyToCommunity, energyToPublicGrid];
-    chartOut.data.datasets[0].data = [energyFromCommunity, energyFromPublicGrid];
+      chartInData;
+    chartIn.data.datasets[0].data = [
+      Math.round((energyToCommunity / (energyToCommunity + energyToPublicGrid)) * 100),
+      Math.round((energyToPublicGrid / (energyToCommunity + energyToPublicGrid)) * 100),
+    ];
     chartIn.update();
+    chartOut.data.datasets[0].data = [
+      Math.round((energyFromCommunity / (energyFromCommunity + energyFromPublicGrid)) * 100),
+      Math.round((energyFromPublicGrid / (energyFromCommunity + energyFromPublicGrid)) * 100),
+    ];
     chartOut.update();
   }
 </script>
@@ -39,21 +45,37 @@
 <Card title="Energy Flow">
   <span slot="action">
     <div class="flex">
-      <input type="date" class="input-sm mr-2" bind:value={startDate} on:change={updateChart} />
-      <input type="date" class="input-sm" bind:value={endDate} on:change={updateChart} />
+      <div class="flex-col m-2">
+        <span class="text-gray-500 text-xs font-medium">From</span>
+        <input
+          type="date"
+          class="input-sm mr-2 px-1 py-1"
+          bind:value={startDate}
+          on:change={updateChart}
+        />
+      </div>
+      <div class="flex-col m-2">
+        <span class="text-gray-500 text-xs font-medium">To</span>
+        <input
+          type="date"
+          class="input-sm px-1 py-1"
+          bind:value={endDate}
+          on:change={updateChart}
+        />
+      </div>
     </div>
   </span>
 
   <div class="flex items-center mb-8">
     <div class="flex flex-col items-center mx-8">
       <div>
-        <canvas id="chartIn" class="w-64" />
+        <canvas id="chartIn" class="w-52" />
       </div>
       <span class="text-gray-900 font-medium">Consumption</span>
     </div>
     <div class="flex flex-col items-center mx-8">
       <div>
-        <canvas id="chartOut" class="w-64" />
+        <canvas id="chartOut" class="w-52" />
       </div>
       <span class="text-gray-900 font-medium">Production</span>
     </div>
@@ -64,7 +86,7 @@
       <span class="text-gray-500 font-medium ml-1">Community</span>
     </div>
     <div class="flex items-center ml-4">
-      <div class="w-4 h-4 rounded-sm bg-red-400" />
+      <div class="w-4 h-4 rounded-sm bg-black" />
       <span class="text-gray-500 font-medium ml-1">Public Grid</span>
     </div>
   </div>

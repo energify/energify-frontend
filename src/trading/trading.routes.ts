@@ -5,6 +5,6 @@ import Trading from "./routes/Trading.svelte";
 export default {
   "/trading": wrap({
     component: Trading,
-    conditions: [async () => await authService.isLoggedIn()],
+    //conditions: [async () => await authService.isLoggedIn()],
   }),
 };

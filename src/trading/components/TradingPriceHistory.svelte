@@ -7,6 +7,7 @@
   import { arrayFromRange, intervalToChartLabel } from "../../common/misc.util";
   import { transactionsService } from "../../common/services/services.injector";
   import IntervalSelector from "../../common/components/interval-selector/IntervalSelector.svelte";
+  import { priceHistoryOptions } from "../chart-options/price-history.options";
 
   let chart: Chart;
   let interval: number = 1;
@@ -27,35 +28,9 @@
     },
   ];
 
-  let options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: { enabled: true },
-    },
-    scales: {
-      x: {
-        grid: { display: false, borderColor: "#F3F4F6" },
-        ticks: {
-          font: { size: 14, family: "Inter" },
-          color: "rgb(156, 163, 175)",
-        },
-      },
-      y: {
-        beginAtZero: true,
-        grid: { drawBorder: false, color: "#F3F4F6" },
-        ticks: {
-          font: { size: 14, family: "Inter" },
-          color: "rgb(156, 163, 175)",
-        },
-      },
-    },
-  };
-
-  onMount(async () => {
+  onMount(() => {
     const canvas = document.getElementById("priceHistoryChart") as HTMLCanvasElement;
-    chart = createChart(canvas.getContext("2d"), "line", dataset, labels, options);
+    chart = createChart(canvas.getContext("2d"), "line", dataset, labels, priceHistoryOptions);
     updateChart();
   });
 

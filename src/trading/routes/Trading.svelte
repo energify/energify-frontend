@@ -1,6 +1,5 @@
 <script>
   import Shell from "../../common/components/shell/Shell.svelte";
-  import { notificationsService } from "../../common/services/services.injector";
   import TradingPriceHistory from "../components/TradingPriceHistory.svelte";
   import TradingPricesLatest from "../components/TradingPricesLatest.svelte";
   import TradingPricesSettings from "../components/TradingPricesSettings.svelte";

@@ -1,9 +1,11 @@
-<script>
+<script lang="ts">
   import Icon, { Exclamation } from "svelte-hero-icons";
   import Card from "../../common/components/card/Card.svelte";
   import { hederaService } from "../../common/services/services.injector";
 
   const { hederaAccountInfo } = hederaService;
+
+  let privateKey: string = "";
 </script>
 
 <Card title="Informations">
@@ -44,9 +46,9 @@
       </div>
     </div>
     <div class="flex items-center">
-      <input class="input mr-3" placeholder="Private key" />
+      <input class="input mr-3" placeholder="Private key" bind:value={privateKey} />
       <button
-        on:click={() => hederaService.exportPrivateKey()}
+        on:click={() => hederaService.importPrivateKey(privateKey)}
         class="btn-secundary flex items-center"
       >
         Import

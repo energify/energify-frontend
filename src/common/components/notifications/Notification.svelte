@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Icon, { X, Exclamation, InformationCircle, CheckCircle } from "svelte-hero-icons";
-  import type { Notification } from "../../services/notifications.interfaces";
+  import type { Notification } from "../../interfaces/notifications.interfaces";
   import { notificationsService } from "../../services/services.injector";
 
   export let id: number;

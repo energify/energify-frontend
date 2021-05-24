@@ -1,5 +1,5 @@
 import { writable } from "svelte/store";
-import type { Notification } from "./notifications.interfaces";
+import type { Notification } from "../interfaces/notifications.interfaces";
 
 export class NotificationService {
   notifications = writable(new Array<Notification>());

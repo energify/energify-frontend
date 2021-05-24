@@ -12845,7 +12845,7 @@
     function sorter(a, b) {
       return a - b;
     }
-    function parse$1(scale, input) {
+    function parse(scale, input) {
       if (isNullOrUndef(input)) {
         return null;
       }
@@ -12964,7 +12964,7 @@
         if (raw === undefined) {
           return null;
         }
-        return parse$1(this, raw);
+        return parse(this, raw);
       }
       beforeLayout() {
         super.beforeLayout();
@@ -13181,7 +13181,7 @@
         }
         const labels = me.getLabels();
         for (i = 0, ilen = labels.length; i < ilen; ++i) {
-          timestamps.push(parse$1(me, labels[i]));
+          timestamps.push(parse(me, labels[i]));
         }
         return (me._cache.labels = me._normalized ? timestamps : me.normalize(timestamps));
       }
@@ -13731,7 +13731,7 @@
     	return block;
     }
 
-    function create_fragment$v(ctx) {
+    function create_fragment$w(ctx) {
     	let current_block_type_index;
     	let if_block;
     	let if_block_anchor;
@@ -13804,7 +13804,7 @@
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$v.name,
+    		id: create_fragment$w.name,
     		type: "component",
     		source: "",
     		ctx
@@ -13973,7 +13973,7 @@
     	window.location.hash = href;
     }
 
-    function instance$v($$self, $$props, $$invalidate) {
+    function instance$w($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("Router", slots, []);
     	let { routes = {} } = $$props;
@@ -14362,7 +14362,7 @@
     	constructor(options) {
     		super(options);
 
-    		init(this, options, instance$v, create_fragment$v, safe_not_equal, {
+    		init(this, options, instance$w, create_fragment$w, safe_not_equal, {
     			routes: 3,
     			prefix: 4,
     			restoreScrollState: 5
@@ -14372,7 +14372,7 @@
     			component: this,
     			tagName: "Router",
     			options,
-    			id: create_fragment$v.name
+    			id: create_fragment$w.name
     		});
     	}
 
@@ -14401,7 +14401,7 @@
     	}
     }
 
-    let baseUrl = "http://localhost:8080";
+    let baseUrl = "http://energify.av.it.pt";
     async function request(endpoint, method, body) {
         try {
             const req = await fetch(`${baseUrl}${endpoint}`, {
@@ -14459,6 +14459,7 @@
                 if (!get_store_value(this.user).email) {
                     const { data } = await this.details();
                     this.user.set(data);
+                    hederaService.hederaAccountInfo.update((info) => (Object.assign(Object.assign({}, info), { accountId: data.hederaAccountId })));
                 }
                 return true;
             }
@@ -80987,11 +80988,18 @@
             this.hederaAccountInfo.subscribe((v) => localStorage.setItem("hederaAccountInfo", JSON.stringify(v)));
             const { privateKey, accountId } = get_store_value(this.hederaAccountInfo);
             this.client = WebClient.forTestnet();
-            if (!accountId) {
+            if (!privateKey) {
                 this.client.setOperator("0.0.460923", "302e020100300506032b657004220420c6363cedb392f602bcebf78edfb0541812534f492f4d367e32939d7247705884");
             }
             else {
-                this.client.setOperator(accountId, privateKey);
+                try {
+                    this.client.setOperator(accountId, privateKey);
+                }
+                catch (e) {
+                    if (e instanceof BadKeyError) {
+                        this.hederaAccountInfo.update((info) => (Object.assign(Object.assign({}, info), { privateKey: undefined })));
+                    }
+                }
             }
         }
         async generateMnemonic() {
@@ -81043,7 +81051,14 @@
     class PaymentsService {
         constructor() { }
         fetchPayments() {
-            return request("/payments/user", "GET");
+            return {
+                data: [
+                    { id: 1, amount: 9, hederaTransactionId: "1234", createdAt: new Date() },
+                    { id: 2, amount: 3, hederaTransactionId: "4312", createdAt: new Date() },
+                    { id: 3, amount: 5, hederaTransactionId: "4312", createdAt: new Date() },
+                    { id: 4, amount: 1, hederaTransactionId: "4312", createdAt: new Date() },
+                ],
+            };
         }
     }
 
@@ -81257,7 +81272,7 @@
       return new Date(timestamp + amount);
     }
 
-    var MILLISECONDS_IN_HOUR$1 = 3600000;
+    var MILLISECONDS_IN_HOUR = 3600000;
     /**
      * @name addHours
      * @category Hour Helpers
@@ -81284,7 +81299,7 @@
     function addHours(dirtyDate, dirtyAmount) {
       requiredArgs(2, arguments);
       var amount = toInteger(dirtyAmount);
-      return addMilliseconds(dirtyDate, amount * MILLISECONDS_IN_HOUR$1);
+      return addMilliseconds(dirtyDate, amount * MILLISECONDS_IN_HOUR);
     }
 
     /**
@@ -83506,13 +83521,13 @@
     //   then the sequence will continue until the end of the string.
     // - . matches any single character unmatched by previous parts of the RegExps
 
-    var formattingTokensRegExp$1 = /[yYQqMLwIdDecihHKkms]o|(\w)\1*|''|'(''|[^'])+('|$)|./g; // This RegExp catches symbols escaped by quotes, and also
+    var formattingTokensRegExp = /[yYQqMLwIdDecihHKkms]o|(\w)\1*|''|'(''|[^'])+('|$)|./g; // This RegExp catches symbols escaped by quotes, and also
     // sequences of symbols P, p, and the combinations like `PPPPPPPppppp`
 
-    var longFormattingTokensRegExp$1 = /P+p+|P+|p+|''|'(''|[^'])+('|$)|./g;
-    var escapedStringRegExp$1 = /^'([^]*?)'?$/;
-    var doubleQuoteRegExp$1 = /''/g;
-    var unescapedLatinCharacterRegExp$1 = /[a-zA-Z]/;
+    var longFormattingTokensRegExp = /P+p+|P+|p+|''|'(''|[^'])+('|$)|./g;
+    var escapedStringRegExp = /^'([^]*?)'?$/;
+    var doubleQuoteRegExp = /''/g;
+    var unescapedLatinCharacterRegExp = /[a-zA-Z]/;
     /**
      * @name format
      * @category Common Helpers
@@ -83871,7 +83886,7 @@
         locale: locale$1,
         _originalDate: originalDate
       };
-      var result = formatStr.match(longFormattingTokensRegExp$1).map(function (substring) {
+      var result = formatStr.match(longFormattingTokensRegExp).map(function (substring) {
         var firstCharacter = substring[0];
 
         if (firstCharacter === 'p' || firstCharacter === 'P') {
@@ -83880,7 +83895,7 @@
         }
 
         return substring;
-      }).join('').match(formattingTokensRegExp$1).map(function (substring) {
+      }).join('').match(formattingTokensRegExp).map(function (substring) {
         // Replace two single quote characters with one single quote character
         if (substring === "''") {
           return "'";
@@ -83889,7 +83904,7 @@
         var firstCharacter = substring[0];
 
         if (firstCharacter === "'") {
-          return cleanEscapedString$1(substring);
+          return cleanEscapedString(substring);
         }
 
         var formatter = formatters[firstCharacter];
@@ -83906,7 +83921,7 @@
           return formatter(utcDate, substring, locale$1.localize, formatterOptions);
         }
 
-        if (firstCharacter.match(unescapedLatinCharacterRegExp$1)) {
+        if (firstCharacter.match(unescapedLatinCharacterRegExp)) {
           throw new RangeError('Format string contains an unescaped latin alphabet character `' + firstCharacter + '`');
         }
 
@@ -83915,8 +83930,8 @@
       return result;
     }
 
-    function cleanEscapedString$1(input) {
-      return input.match(escapedStringRegExp$1)[1].replace(doubleQuoteRegExp$1, "'");
+    function cleanEscapedString(input) {
+      return input.match(escapedStringRegExp)[1].replace(doubleQuoteRegExp, "'");
     }
 
     function assign(target, dirtyObject) {
@@ -84314,2110 +84329,6 @@
       return addMonths(dirtyDate, -amount);
     }
 
-    // See issue: https://github.com/date-fns/date-fns/issues/376
-
-    function setUTCDay(dirtyDate, dirtyDay, dirtyOptions) {
-      requiredArgs(2, arguments);
-      var options = dirtyOptions || {};
-      var locale = options.locale;
-      var localeWeekStartsOn = locale && locale.options && locale.options.weekStartsOn;
-      var defaultWeekStartsOn = localeWeekStartsOn == null ? 0 : toInteger(localeWeekStartsOn);
-      var weekStartsOn = options.weekStartsOn == null ? defaultWeekStartsOn : toInteger(options.weekStartsOn); // Test if weekStartsOn is between 0 and 6 _and_ is not NaN
-
-      if (!(weekStartsOn >= 0 && weekStartsOn <= 6)) {
-        throw new RangeError('weekStartsOn must be between 0 and 6 inclusively');
-      }
-
-      var date = toDate(dirtyDate);
-      var day = toInteger(dirtyDay);
-      var currentDay = date.getUTCDay();
-      var remainder = day % 7;
-      var dayIndex = (remainder + 7) % 7;
-      var diff = (dayIndex < weekStartsOn ? 7 : 0) + day - currentDay;
-      date.setUTCDate(date.getUTCDate() + diff);
-      return date;
-    }
-
-    // See issue: https://github.com/date-fns/date-fns/issues/376
-
-    function setUTCISODay(dirtyDate, dirtyDay) {
-      requiredArgs(2, arguments);
-      var day = toInteger(dirtyDay);
-
-      if (day % 7 === 0) {
-        day = day - 7;
-      }
-
-      var weekStartsOn = 1;
-      var date = toDate(dirtyDate);
-      var currentDay = date.getUTCDay();
-      var remainder = day % 7;
-      var dayIndex = (remainder + 7) % 7;
-      var diff = (dayIndex < weekStartsOn ? 7 : 0) + day - currentDay;
-      date.setUTCDate(date.getUTCDate() + diff);
-      return date;
-    }
-
-    // See issue: https://github.com/date-fns/date-fns/issues/376
-
-    function setUTCISOWeek(dirtyDate, dirtyISOWeek) {
-      requiredArgs(2, arguments);
-      var date = toDate(dirtyDate);
-      var isoWeek = toInteger(dirtyISOWeek);
-      var diff = getUTCISOWeek(date) - isoWeek;
-      date.setUTCDate(date.getUTCDate() - diff * 7);
-      return date;
-    }
-
-    // See issue: https://github.com/date-fns/date-fns/issues/376
-
-    function setUTCWeek(dirtyDate, dirtyWeek, options) {
-      requiredArgs(2, arguments);
-      var date = toDate(dirtyDate);
-      var week = toInteger(dirtyWeek);
-      var diff = getUTCWeek(date, options) - week;
-      date.setUTCDate(date.getUTCDate() - diff * 7);
-      return date;
-    }
-
-    var MILLISECONDS_IN_HOUR = 3600000;
-    var MILLISECONDS_IN_MINUTE = 60000;
-    var MILLISECONDS_IN_SECOND = 1000;
-    var numericPatterns = {
-      month: /^(1[0-2]|0?\d)/,
-      // 0 to 12
-      date: /^(3[0-1]|[0-2]?\d)/,
-      // 0 to 31
-      dayOfYear: /^(36[0-6]|3[0-5]\d|[0-2]?\d?\d)/,
-      // 0 to 366
-      week: /^(5[0-3]|[0-4]?\d)/,
-      // 0 to 53
-      hour23h: /^(2[0-3]|[0-1]?\d)/,
-      // 0 to 23
-      hour24h: /^(2[0-4]|[0-1]?\d)/,
-      // 0 to 24
-      hour11h: /^(1[0-1]|0?\d)/,
-      // 0 to 11
-      hour12h: /^(1[0-2]|0?\d)/,
-      // 0 to 12
-      minute: /^[0-5]?\d/,
-      // 0 to 59
-      second: /^[0-5]?\d/,
-      // 0 to 59
-      singleDigit: /^\d/,
-      // 0 to 9
-      twoDigits: /^\d{1,2}/,
-      // 0 to 99
-      threeDigits: /^\d{1,3}/,
-      // 0 to 999
-      fourDigits: /^\d{1,4}/,
-      // 0 to 9999
-      anyDigitsSigned: /^-?\d+/,
-      singleDigitSigned: /^-?\d/,
-      // 0 to 9, -0 to -9
-      twoDigitsSigned: /^-?\d{1,2}/,
-      // 0 to 99, -0 to -99
-      threeDigitsSigned: /^-?\d{1,3}/,
-      // 0 to 999, -0 to -999
-      fourDigitsSigned: /^-?\d{1,4}/ // 0 to 9999, -0 to -9999
-
-    };
-    var timezonePatterns = {
-      basicOptionalMinutes: /^([+-])(\d{2})(\d{2})?|Z/,
-      basic: /^([+-])(\d{2})(\d{2})|Z/,
-      basicOptionalSeconds: /^([+-])(\d{2})(\d{2})((\d{2}))?|Z/,
-      extended: /^([+-])(\d{2}):(\d{2})|Z/,
-      extendedOptionalSeconds: /^([+-])(\d{2}):(\d{2})(:(\d{2}))?|Z/
-    };
-
-    function parseNumericPattern(pattern, string, valueCallback) {
-      var matchResult = string.match(pattern);
-
-      if (!matchResult) {
-        return null;
-      }
-
-      var value = parseInt(matchResult[0], 10);
-      return {
-        value: valueCallback ? valueCallback(value) : value,
-        rest: string.slice(matchResult[0].length)
-      };
-    }
-
-    function parseTimezonePattern(pattern, string) {
-      var matchResult = string.match(pattern);
-
-      if (!matchResult) {
-        return null;
-      } // Input is 'Z'
-
-
-      if (matchResult[0] === 'Z') {
-        return {
-          value: 0,
-          rest: string.slice(1)
-        };
-      }
-
-      var sign = matchResult[1] === '+' ? 1 : -1;
-      var hours = matchResult[2] ? parseInt(matchResult[2], 10) : 0;
-      var minutes = matchResult[3] ? parseInt(matchResult[3], 10) : 0;
-      var seconds = matchResult[5] ? parseInt(matchResult[5], 10) : 0;
-      return {
-        value: sign * (hours * MILLISECONDS_IN_HOUR + minutes * MILLISECONDS_IN_MINUTE + seconds * MILLISECONDS_IN_SECOND),
-        rest: string.slice(matchResult[0].length)
-      };
-    }
-
-    function parseAnyDigitsSigned(string, valueCallback) {
-      return parseNumericPattern(numericPatterns.anyDigitsSigned, string, valueCallback);
-    }
-
-    function parseNDigits(n, string, valueCallback) {
-      switch (n) {
-        case 1:
-          return parseNumericPattern(numericPatterns.singleDigit, string, valueCallback);
-
-        case 2:
-          return parseNumericPattern(numericPatterns.twoDigits, string, valueCallback);
-
-        case 3:
-          return parseNumericPattern(numericPatterns.threeDigits, string, valueCallback);
-
-        case 4:
-          return parseNumericPattern(numericPatterns.fourDigits, string, valueCallback);
-
-        default:
-          return parseNumericPattern(new RegExp('^\\d{1,' + n + '}'), string, valueCallback);
-      }
-    }
-
-    function parseNDigitsSigned(n, string, valueCallback) {
-      switch (n) {
-        case 1:
-          return parseNumericPattern(numericPatterns.singleDigitSigned, string, valueCallback);
-
-        case 2:
-          return parseNumericPattern(numericPatterns.twoDigitsSigned, string, valueCallback);
-
-        case 3:
-          return parseNumericPattern(numericPatterns.threeDigitsSigned, string, valueCallback);
-
-        case 4:
-          return parseNumericPattern(numericPatterns.fourDigitsSigned, string, valueCallback);
-
-        default:
-          return parseNumericPattern(new RegExp('^-?\\d{1,' + n + '}'), string, valueCallback);
-      }
-    }
-
-    function dayPeriodEnumToHours(enumValue) {
-      switch (enumValue) {
-        case 'morning':
-          return 4;
-
-        case 'evening':
-          return 17;
-
-        case 'pm':
-        case 'noon':
-        case 'afternoon':
-          return 12;
-
-        case 'am':
-        case 'midnight':
-        case 'night':
-        default:
-          return 0;
-      }
-    }
-
-    function normalizeTwoDigitYear(twoDigitYear, currentYear) {
-      var isCommonEra = currentYear > 0; // Absolute number of the current year:
-      // 1 -> 1 AC
-      // 0 -> 1 BC
-      // -1 -> 2 BC
-
-      var absCurrentYear = isCommonEra ? currentYear : 1 - currentYear;
-      var result;
-
-      if (absCurrentYear <= 50) {
-        result = twoDigitYear || 100;
-      } else {
-        var rangeEnd = absCurrentYear + 50;
-        var rangeEndCentury = Math.floor(rangeEnd / 100) * 100;
-        var isPreviousCentury = twoDigitYear >= rangeEnd % 100;
-        result = twoDigitYear + rangeEndCentury - (isPreviousCentury ? 100 : 0);
-      }
-
-      return isCommonEra ? result : 1 - result;
-    }
-
-    var DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-    var DAYS_IN_MONTH_LEAP_YEAR = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]; // User for validation
-
-    function isLeapYearIndex(year) {
-      return year % 400 === 0 || year % 4 === 0 && year % 100 !== 0;
-    }
-    /*
-     * |     | Unit                           |     | Unit                           |
-     * |-----|--------------------------------|-----|--------------------------------|
-     * |  a  | AM, PM                         |  A* | Milliseconds in day            |
-     * |  b  | AM, PM, noon, midnight         |  B  | Flexible day period            |
-     * |  c  | Stand-alone local day of week  |  C* | Localized hour w/ day period   |
-     * |  d  | Day of month                   |  D  | Day of year                    |
-     * |  e  | Local day of week              |  E  | Day of week                    |
-     * |  f  |                                |  F* | Day of week in month           |
-     * |  g* | Modified Julian day            |  G  | Era                            |
-     * |  h  | Hour [1-12]                    |  H  | Hour [0-23]                    |
-     * |  i! | ISO day of week                |  I! | ISO week of year               |
-     * |  j* | Localized hour w/ day period   |  J* | Localized hour w/o day period  |
-     * |  k  | Hour [1-24]                    |  K  | Hour [0-11]                    |
-     * |  l* | (deprecated)                   |  L  | Stand-alone month              |
-     * |  m  | Minute                         |  M  | Month                          |
-     * |  n  |                                |  N  |                                |
-     * |  o! | Ordinal number modifier        |  O* | Timezone (GMT)                 |
-     * |  p  |                                |  P  |                                |
-     * |  q  | Stand-alone quarter            |  Q  | Quarter                        |
-     * |  r* | Related Gregorian year         |  R! | ISO week-numbering year        |
-     * |  s  | Second                         |  S  | Fraction of second             |
-     * |  t! | Seconds timestamp              |  T! | Milliseconds timestamp         |
-     * |  u  | Extended year                  |  U* | Cyclic year                    |
-     * |  v* | Timezone (generic non-locat.)  |  V* | Timezone (location)            |
-     * |  w  | Local week of year             |  W* | Week of month                  |
-     * |  x  | Timezone (ISO-8601 w/o Z)      |  X  | Timezone (ISO-8601)            |
-     * |  y  | Year (abs)                     |  Y  | Local week-numbering year      |
-     * |  z* | Timezone (specific non-locat.) |  Z* | Timezone (aliases)             |
-     *
-     * Letters marked by * are not implemented but reserved by Unicode standard.
-     *
-     * Letters marked by ! are non-standard, but implemented by date-fns:
-     * - `o` modifies the previous token to turn it into an ordinal (see `parse` docs)
-     * - `i` is ISO day of week. For `i` and `ii` is returns numeric ISO week days,
-     *   i.e. 7 for Sunday, 1 for Monday, etc.
-     * - `I` is ISO week of year, as opposed to `w` which is local week of year.
-     * - `R` is ISO week-numbering year, as opposed to `Y` which is local week-numbering year.
-     *   `R` is supposed to be used in conjunction with `I` and `i`
-     *   for universal ISO week-numbering date, whereas
-     *   `Y` is supposed to be used in conjunction with `w` and `e`
-     *   for week-numbering date specific to the locale.
-     */
-
-
-    var parsers = {
-      // Era
-      G: {
-        priority: 140,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            // AD, BC
-            case 'G':
-            case 'GG':
-            case 'GGG':
-              return match.era(string, {
-                width: 'abbreviated'
-              }) || match.era(string, {
-                width: 'narrow'
-              });
-            // A, B
-
-            case 'GGGGG':
-              return match.era(string, {
-                width: 'narrow'
-              });
-            // Anno Domini, Before Christ
-
-            case 'GGGG':
-            default:
-              return match.era(string, {
-                width: 'wide'
-              }) || match.era(string, {
-                width: 'abbreviated'
-              }) || match.era(string, {
-                width: 'narrow'
-              });
-          }
-        },
-        set: function (date, flags, value, _options) {
-          flags.era = value;
-          date.setUTCFullYear(value, 0, 1);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['R', 'u', 't', 'T']
-      },
-      // Year
-      y: {
-        // From http://www.unicode.org/reports/tr35/tr35-31/tr35-dates.html#Date_Format_Patterns
-        // | Year     |     y | yy |   yyy |  yyyy | yyyyy |
-        // |----------|-------|----|-------|-------|-------|
-        // | AD 1     |     1 | 01 |   001 |  0001 | 00001 |
-        // | AD 12    |    12 | 12 |   012 |  0012 | 00012 |
-        // | AD 123   |   123 | 23 |   123 |  0123 | 00123 |
-        // | AD 1234  |  1234 | 34 |  1234 |  1234 | 01234 |
-        // | AD 12345 | 12345 | 45 | 12345 | 12345 | 12345 |
-        priority: 130,
-        parse: function (string, token, match, _options) {
-          var valueCallback = function (year) {
-            return {
-              year: year,
-              isTwoDigitYear: token === 'yy'
-            };
-          };
-
-          switch (token) {
-            case 'y':
-              return parseNDigits(4, string, valueCallback);
-
-            case 'yo':
-              return match.ordinalNumber(string, {
-                unit: 'year',
-                valueCallback: valueCallback
-              });
-
-            default:
-              return parseNDigits(token.length, string, valueCallback);
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value.isTwoDigitYear || value.year > 0;
-        },
-        set: function (date, flags, value, _options) {
-          var currentYear = date.getUTCFullYear();
-
-          if (value.isTwoDigitYear) {
-            var normalizedTwoDigitYear = normalizeTwoDigitYear(value.year, currentYear);
-            date.setUTCFullYear(normalizedTwoDigitYear, 0, 1);
-            date.setUTCHours(0, 0, 0, 0);
-            return date;
-          }
-
-          var year = !('era' in flags) || flags.era === 1 ? value.year : 1 - value.year;
-          date.setUTCFullYear(year, 0, 1);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['Y', 'R', 'u', 'w', 'I', 'i', 'e', 'c', 't', 'T']
-      },
-      // Local week-numbering year
-      Y: {
-        priority: 130,
-        parse: function (string, token, match, _options) {
-          var valueCallback = function (year) {
-            return {
-              year: year,
-              isTwoDigitYear: token === 'YY'
-            };
-          };
-
-          switch (token) {
-            case 'Y':
-              return parseNDigits(4, string, valueCallback);
-
-            case 'Yo':
-              return match.ordinalNumber(string, {
-                unit: 'year',
-                valueCallback: valueCallback
-              });
-
-            default:
-              return parseNDigits(token.length, string, valueCallback);
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value.isTwoDigitYear || value.year > 0;
-        },
-        set: function (date, flags, value, options) {
-          var currentYear = getUTCWeekYear(date, options);
-
-          if (value.isTwoDigitYear) {
-            var normalizedTwoDigitYear = normalizeTwoDigitYear(value.year, currentYear);
-            date.setUTCFullYear(normalizedTwoDigitYear, 0, options.firstWeekContainsDate);
-            date.setUTCHours(0, 0, 0, 0);
-            return startOfUTCWeek(date, options);
-          }
-
-          var year = !('era' in flags) || flags.era === 1 ? value.year : 1 - value.year;
-          date.setUTCFullYear(year, 0, options.firstWeekContainsDate);
-          date.setUTCHours(0, 0, 0, 0);
-          return startOfUTCWeek(date, options);
-        },
-        incompatibleTokens: ['y', 'R', 'u', 'Q', 'q', 'M', 'L', 'I', 'd', 'D', 'i', 't', 'T']
-      },
-      // ISO week-numbering year
-      R: {
-        priority: 130,
-        parse: function (string, token, _match, _options) {
-          if (token === 'R') {
-            return parseNDigitsSigned(4, string);
-          }
-
-          return parseNDigitsSigned(token.length, string);
-        },
-        set: function (_date, _flags, value, _options) {
-          var firstWeekOfYear = new Date(0);
-          firstWeekOfYear.setUTCFullYear(value, 0, 4);
-          firstWeekOfYear.setUTCHours(0, 0, 0, 0);
-          return startOfUTCISOWeek(firstWeekOfYear);
-        },
-        incompatibleTokens: ['G', 'y', 'Y', 'u', 'Q', 'q', 'M', 'L', 'w', 'd', 'D', 'e', 'c', 't', 'T']
-      },
-      // Extended year
-      u: {
-        priority: 130,
-        parse: function (string, token, _match, _options) {
-          if (token === 'u') {
-            return parseNDigitsSigned(4, string);
-          }
-
-          return parseNDigitsSigned(token.length, string);
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCFullYear(value, 0, 1);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['G', 'y', 'Y', 'R', 'w', 'I', 'i', 'e', 'c', 't', 'T']
-      },
-      // Quarter
-      Q: {
-        priority: 120,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            // 1, 2, 3, 4
-            case 'Q':
-            case 'QQ':
-              // 01, 02, 03, 04
-              return parseNDigits(token.length, string);
-            // 1st, 2nd, 3rd, 4th
-
-            case 'Qo':
-              return match.ordinalNumber(string, {
-                unit: 'quarter'
-              });
-            // Q1, Q2, Q3, Q4
-
-            case 'QQQ':
-              return match.quarter(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.quarter(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-            // 1, 2, 3, 4 (narrow quarter; could be not numerical)
-
-            case 'QQQQQ':
-              return match.quarter(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-            // 1st quarter, 2nd quarter, ...
-
-            case 'QQQQ':
-            default:
-              return match.quarter(string, {
-                width: 'wide',
-                context: 'formatting'
-              }) || match.quarter(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.quarter(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 1 && value <= 4;
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCMonth((value - 1) * 3, 1);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['Y', 'R', 'q', 'M', 'L', 'w', 'I', 'd', 'D', 'i', 'e', 'c', 't', 'T']
-      },
-      // Stand-alone quarter
-      q: {
-        priority: 120,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            // 1, 2, 3, 4
-            case 'q':
-            case 'qq':
-              // 01, 02, 03, 04
-              return parseNDigits(token.length, string);
-            // 1st, 2nd, 3rd, 4th
-
-            case 'qo':
-              return match.ordinalNumber(string, {
-                unit: 'quarter'
-              });
-            // Q1, Q2, Q3, Q4
-
-            case 'qqq':
-              return match.quarter(string, {
-                width: 'abbreviated',
-                context: 'standalone'
-              }) || match.quarter(string, {
-                width: 'narrow',
-                context: 'standalone'
-              });
-            // 1, 2, 3, 4 (narrow quarter; could be not numerical)
-
-            case 'qqqqq':
-              return match.quarter(string, {
-                width: 'narrow',
-                context: 'standalone'
-              });
-            // 1st quarter, 2nd quarter, ...
-
-            case 'qqqq':
-            default:
-              return match.quarter(string, {
-                width: 'wide',
-                context: 'standalone'
-              }) || match.quarter(string, {
-                width: 'abbreviated',
-                context: 'standalone'
-              }) || match.quarter(string, {
-                width: 'narrow',
-                context: 'standalone'
-              });
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 1 && value <= 4;
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCMonth((value - 1) * 3, 1);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['Y', 'R', 'Q', 'M', 'L', 'w', 'I', 'd', 'D', 'i', 'e', 'c', 't', 'T']
-      },
-      // Month
-      M: {
-        priority: 110,
-        parse: function (string, token, match, _options) {
-          var valueCallback = function (value) {
-            return value - 1;
-          };
-
-          switch (token) {
-            // 1, 2, ..., 12
-            case 'M':
-              return parseNumericPattern(numericPatterns.month, string, valueCallback);
-            // 01, 02, ..., 12
-
-            case 'MM':
-              return parseNDigits(2, string, valueCallback);
-            // 1st, 2nd, ..., 12th
-
-            case 'Mo':
-              return match.ordinalNumber(string, {
-                unit: 'month',
-                valueCallback: valueCallback
-              });
-            // Jan, Feb, ..., Dec
-
-            case 'MMM':
-              return match.month(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.month(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-            // J, F, ..., D
-
-            case 'MMMMM':
-              return match.month(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-            // January, February, ..., December
-
-            case 'MMMM':
-            default:
-              return match.month(string, {
-                width: 'wide',
-                context: 'formatting'
-              }) || match.month(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.month(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 0 && value <= 11;
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCMonth(value, 1);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['Y', 'R', 'q', 'Q', 'L', 'w', 'I', 'D', 'i', 'e', 'c', 't', 'T']
-      },
-      // Stand-alone month
-      L: {
-        priority: 110,
-        parse: function (string, token, match, _options) {
-          var valueCallback = function (value) {
-            return value - 1;
-          };
-
-          switch (token) {
-            // 1, 2, ..., 12
-            case 'L':
-              return parseNumericPattern(numericPatterns.month, string, valueCallback);
-            // 01, 02, ..., 12
-
-            case 'LL':
-              return parseNDigits(2, string, valueCallback);
-            // 1st, 2nd, ..., 12th
-
-            case 'Lo':
-              return match.ordinalNumber(string, {
-                unit: 'month',
-                valueCallback: valueCallback
-              });
-            // Jan, Feb, ..., Dec
-
-            case 'LLL':
-              return match.month(string, {
-                width: 'abbreviated',
-                context: 'standalone'
-              }) || match.month(string, {
-                width: 'narrow',
-                context: 'standalone'
-              });
-            // J, F, ..., D
-
-            case 'LLLLL':
-              return match.month(string, {
-                width: 'narrow',
-                context: 'standalone'
-              });
-            // January, February, ..., December
-
-            case 'LLLL':
-            default:
-              return match.month(string, {
-                width: 'wide',
-                context: 'standalone'
-              }) || match.month(string, {
-                width: 'abbreviated',
-                context: 'standalone'
-              }) || match.month(string, {
-                width: 'narrow',
-                context: 'standalone'
-              });
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 0 && value <= 11;
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCMonth(value, 1);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['Y', 'R', 'q', 'Q', 'M', 'w', 'I', 'D', 'i', 'e', 'c', 't', 'T']
-      },
-      // Local week of year
-      w: {
-        priority: 100,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'w':
-              return parseNumericPattern(numericPatterns.week, string);
-
-            case 'wo':
-              return match.ordinalNumber(string, {
-                unit: 'week'
-              });
-
-            default:
-              return parseNDigits(token.length, string);
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 1 && value <= 53;
-        },
-        set: function (date, _flags, value, options) {
-          return startOfUTCWeek(setUTCWeek(date, value, options), options);
-        },
-        incompatibleTokens: ['y', 'R', 'u', 'q', 'Q', 'M', 'L', 'I', 'd', 'D', 'i', 't', 'T']
-      },
-      // ISO week of year
-      I: {
-        priority: 100,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'I':
-              return parseNumericPattern(numericPatterns.week, string);
-
-            case 'Io':
-              return match.ordinalNumber(string, {
-                unit: 'week'
-              });
-
-            default:
-              return parseNDigits(token.length, string);
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 1 && value <= 53;
-        },
-        set: function (date, _flags, value, options) {
-          return startOfUTCISOWeek(setUTCISOWeek(date, value, options), options);
-        },
-        incompatibleTokens: ['y', 'Y', 'u', 'q', 'Q', 'M', 'L', 'w', 'd', 'D', 'e', 'c', 't', 'T']
-      },
-      // Day of the month
-      d: {
-        priority: 90,
-        subPriority: 1,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'd':
-              return parseNumericPattern(numericPatterns.date, string);
-
-            case 'do':
-              return match.ordinalNumber(string, {
-                unit: 'date'
-              });
-
-            default:
-              return parseNDigits(token.length, string);
-          }
-        },
-        validate: function (date, value, _options) {
-          var year = date.getUTCFullYear();
-          var isLeapYear = isLeapYearIndex(year);
-          var month = date.getUTCMonth();
-
-          if (isLeapYear) {
-            return value >= 1 && value <= DAYS_IN_MONTH_LEAP_YEAR[month];
-          } else {
-            return value >= 1 && value <= DAYS_IN_MONTH[month];
-          }
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCDate(value);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['Y', 'R', 'q', 'Q', 'w', 'I', 'D', 'i', 'e', 'c', 't', 'T']
-      },
-      // Day of year
-      D: {
-        priority: 90,
-        subPriority: 1,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'D':
-            case 'DD':
-              return parseNumericPattern(numericPatterns.dayOfYear, string);
-
-            case 'Do':
-              return match.ordinalNumber(string, {
-                unit: 'date'
-              });
-
-            default:
-              return parseNDigits(token.length, string);
-          }
-        },
-        validate: function (date, value, _options) {
-          var year = date.getUTCFullYear();
-          var isLeapYear = isLeapYearIndex(year);
-
-          if (isLeapYear) {
-            return value >= 1 && value <= 366;
-          } else {
-            return value >= 1 && value <= 365;
-          }
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCMonth(0, value);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['Y', 'R', 'q', 'Q', 'M', 'L', 'w', 'I', 'd', 'E', 'i', 'e', 'c', 't', 'T']
-      },
-      // Day of week
-      E: {
-        priority: 90,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            // Tue
-            case 'E':
-            case 'EE':
-            case 'EEE':
-              return match.day(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'short',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-            // T
-
-            case 'EEEEE':
-              return match.day(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-            // Tu
-
-            case 'EEEEEE':
-              return match.day(string, {
-                width: 'short',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-            // Tuesday
-
-            case 'EEEE':
-            default:
-              return match.day(string, {
-                width: 'wide',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'short',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 0 && value <= 6;
-        },
-        set: function (date, _flags, value, options) {
-          date = setUTCDay(date, value, options);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['D', 'i', 'e', 'c', 't', 'T']
-      },
-      // Local day of week
-      e: {
-        priority: 90,
-        parse: function (string, token, match, options) {
-          var valueCallback = function (value) {
-            var wholeWeekDays = Math.floor((value - 1) / 7) * 7;
-            return (value + options.weekStartsOn + 6) % 7 + wholeWeekDays;
-          };
-
-          switch (token) {
-            // 3
-            case 'e':
-            case 'ee':
-              // 03
-              return parseNDigits(token.length, string, valueCallback);
-            // 3rd
-
-            case 'eo':
-              return match.ordinalNumber(string, {
-                unit: 'day',
-                valueCallback: valueCallback
-              });
-            // Tue
-
-            case 'eee':
-              return match.day(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'short',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-            // T
-
-            case 'eeeee':
-              return match.day(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-            // Tu
-
-            case 'eeeeee':
-              return match.day(string, {
-                width: 'short',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-            // Tuesday
-
-            case 'eeee':
-            default:
-              return match.day(string, {
-                width: 'wide',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'short',
-                context: 'formatting'
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 0 && value <= 6;
-        },
-        set: function (date, _flags, value, options) {
-          date = setUTCDay(date, value, options);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['y', 'R', 'u', 'q', 'Q', 'M', 'L', 'I', 'd', 'D', 'E', 'i', 'c', 't', 'T']
-      },
-      // Stand-alone local day of week
-      c: {
-        priority: 90,
-        parse: function (string, token, match, options) {
-          var valueCallback = function (value) {
-            var wholeWeekDays = Math.floor((value - 1) / 7) * 7;
-            return (value + options.weekStartsOn + 6) % 7 + wholeWeekDays;
-          };
-
-          switch (token) {
-            // 3
-            case 'c':
-            case 'cc':
-              // 03
-              return parseNDigits(token.length, string, valueCallback);
-            // 3rd
-
-            case 'co':
-              return match.ordinalNumber(string, {
-                unit: 'day',
-                valueCallback: valueCallback
-              });
-            // Tue
-
-            case 'ccc':
-              return match.day(string, {
-                width: 'abbreviated',
-                context: 'standalone'
-              }) || match.day(string, {
-                width: 'short',
-                context: 'standalone'
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'standalone'
-              });
-            // T
-
-            case 'ccccc':
-              return match.day(string, {
-                width: 'narrow',
-                context: 'standalone'
-              });
-            // Tu
-
-            case 'cccccc':
-              return match.day(string, {
-                width: 'short',
-                context: 'standalone'
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'standalone'
-              });
-            // Tuesday
-
-            case 'cccc':
-            default:
-              return match.day(string, {
-                width: 'wide',
-                context: 'standalone'
-              }) || match.day(string, {
-                width: 'abbreviated',
-                context: 'standalone'
-              }) || match.day(string, {
-                width: 'short',
-                context: 'standalone'
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'standalone'
-              });
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 0 && value <= 6;
-        },
-        set: function (date, _flags, value, options) {
-          date = setUTCDay(date, value, options);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['y', 'R', 'u', 'q', 'Q', 'M', 'L', 'I', 'd', 'D', 'E', 'i', 'e', 't', 'T']
-      },
-      // ISO day of week
-      i: {
-        priority: 90,
-        parse: function (string, token, match, _options) {
-          var valueCallback = function (value) {
-            if (value === 0) {
-              return 7;
-            }
-
-            return value;
-          };
-
-          switch (token) {
-            // 2
-            case 'i':
-            case 'ii':
-              // 02
-              return parseNDigits(token.length, string);
-            // 2nd
-
-            case 'io':
-              return match.ordinalNumber(string, {
-                unit: 'day'
-              });
-            // Tue
-
-            case 'iii':
-              return match.day(string, {
-                width: 'abbreviated',
-                context: 'formatting',
-                valueCallback: valueCallback
-              }) || match.day(string, {
-                width: 'short',
-                context: 'formatting',
-                valueCallback: valueCallback
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'formatting',
-                valueCallback: valueCallback
-              });
-            // T
-
-            case 'iiiii':
-              return match.day(string, {
-                width: 'narrow',
-                context: 'formatting',
-                valueCallback: valueCallback
-              });
-            // Tu
-
-            case 'iiiiii':
-              return match.day(string, {
-                width: 'short',
-                context: 'formatting',
-                valueCallback: valueCallback
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'formatting',
-                valueCallback: valueCallback
-              });
-            // Tuesday
-
-            case 'iiii':
-            default:
-              return match.day(string, {
-                width: 'wide',
-                context: 'formatting',
-                valueCallback: valueCallback
-              }) || match.day(string, {
-                width: 'abbreviated',
-                context: 'formatting',
-                valueCallback: valueCallback
-              }) || match.day(string, {
-                width: 'short',
-                context: 'formatting',
-                valueCallback: valueCallback
-              }) || match.day(string, {
-                width: 'narrow',
-                context: 'formatting',
-                valueCallback: valueCallback
-              });
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 1 && value <= 7;
-        },
-        set: function (date, _flags, value, options) {
-          date = setUTCISODay(date, value, options);
-          date.setUTCHours(0, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['y', 'Y', 'u', 'q', 'Q', 'M', 'L', 'w', 'd', 'D', 'E', 'e', 'c', 't', 'T']
-      },
-      // AM or PM
-      a: {
-        priority: 80,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'a':
-            case 'aa':
-            case 'aaa':
-              return match.dayPeriod(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.dayPeriod(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-
-            case 'aaaaa':
-              return match.dayPeriod(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-
-            case 'aaaa':
-            default:
-              return match.dayPeriod(string, {
-                width: 'wide',
-                context: 'formatting'
-              }) || match.dayPeriod(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.dayPeriod(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-          }
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCHours(dayPeriodEnumToHours(value), 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['b', 'B', 'H', 'K', 'k', 't', 'T']
-      },
-      // AM, PM, midnight
-      b: {
-        priority: 80,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'b':
-            case 'bb':
-            case 'bbb':
-              return match.dayPeriod(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.dayPeriod(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-
-            case 'bbbbb':
-              return match.dayPeriod(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-
-            case 'bbbb':
-            default:
-              return match.dayPeriod(string, {
-                width: 'wide',
-                context: 'formatting'
-              }) || match.dayPeriod(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.dayPeriod(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-          }
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCHours(dayPeriodEnumToHours(value), 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['a', 'B', 'H', 'K', 'k', 't', 'T']
-      },
-      // in the morning, in the afternoon, in the evening, at night
-      B: {
-        priority: 80,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'B':
-            case 'BB':
-            case 'BBB':
-              return match.dayPeriod(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.dayPeriod(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-
-            case 'BBBBB':
-              return match.dayPeriod(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-
-            case 'BBBB':
-            default:
-              return match.dayPeriod(string, {
-                width: 'wide',
-                context: 'formatting'
-              }) || match.dayPeriod(string, {
-                width: 'abbreviated',
-                context: 'formatting'
-              }) || match.dayPeriod(string, {
-                width: 'narrow',
-                context: 'formatting'
-              });
-          }
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCHours(dayPeriodEnumToHours(value), 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['a', 'b', 't', 'T']
-      },
-      // Hour [1-12]
-      h: {
-        priority: 70,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'h':
-              return parseNumericPattern(numericPatterns.hour12h, string);
-
-            case 'ho':
-              return match.ordinalNumber(string, {
-                unit: 'hour'
-              });
-
-            default:
-              return parseNDigits(token.length, string);
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 1 && value <= 12;
-        },
-        set: function (date, _flags, value, _options) {
-          var isPM = date.getUTCHours() >= 12;
-
-          if (isPM && value < 12) {
-            date.setUTCHours(value + 12, 0, 0, 0);
-          } else if (!isPM && value === 12) {
-            date.setUTCHours(0, 0, 0, 0);
-          } else {
-            date.setUTCHours(value, 0, 0, 0);
-          }
-
-          return date;
-        },
-        incompatibleTokens: ['H', 'K', 'k', 't', 'T']
-      },
-      // Hour [0-23]
-      H: {
-        priority: 70,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'H':
-              return parseNumericPattern(numericPatterns.hour23h, string);
-
-            case 'Ho':
-              return match.ordinalNumber(string, {
-                unit: 'hour'
-              });
-
-            default:
-              return parseNDigits(token.length, string);
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 0 && value <= 23;
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCHours(value, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['a', 'b', 'h', 'K', 'k', 't', 'T']
-      },
-      // Hour [0-11]
-      K: {
-        priority: 70,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'K':
-              return parseNumericPattern(numericPatterns.hour11h, string);
-
-            case 'Ko':
-              return match.ordinalNumber(string, {
-                unit: 'hour'
-              });
-
-            default:
-              return parseNDigits(token.length, string);
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 0 && value <= 11;
-        },
-        set: function (date, _flags, value, _options) {
-          var isPM = date.getUTCHours() >= 12;
-
-          if (isPM && value < 12) {
-            date.setUTCHours(value + 12, 0, 0, 0);
-          } else {
-            date.setUTCHours(value, 0, 0, 0);
-          }
-
-          return date;
-        },
-        incompatibleTokens: ['a', 'b', 'h', 'H', 'k', 't', 'T']
-      },
-      // Hour [1-24]
-      k: {
-        priority: 70,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'k':
-              return parseNumericPattern(numericPatterns.hour24h, string);
-
-            case 'ko':
-              return match.ordinalNumber(string, {
-                unit: 'hour'
-              });
-
-            default:
-              return parseNDigits(token.length, string);
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 1 && value <= 24;
-        },
-        set: function (date, _flags, value, _options) {
-          var hours = value <= 24 ? value % 24 : value;
-          date.setUTCHours(hours, 0, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['a', 'b', 'h', 'H', 'K', 't', 'T']
-      },
-      // Minute
-      m: {
-        priority: 60,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 'm':
-              return parseNumericPattern(numericPatterns.minute, string);
-
-            case 'mo':
-              return match.ordinalNumber(string, {
-                unit: 'minute'
-              });
-
-            default:
-              return parseNDigits(token.length, string);
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 0 && value <= 59;
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCMinutes(value, 0, 0);
-          return date;
-        },
-        incompatibleTokens: ['t', 'T']
-      },
-      // Second
-      s: {
-        priority: 50,
-        parse: function (string, token, match, _options) {
-          switch (token) {
-            case 's':
-              return parseNumericPattern(numericPatterns.second, string);
-
-            case 'so':
-              return match.ordinalNumber(string, {
-                unit: 'second'
-              });
-
-            default:
-              return parseNDigits(token.length, string);
-          }
-        },
-        validate: function (_date, value, _options) {
-          return value >= 0 && value <= 59;
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCSeconds(value, 0);
-          return date;
-        },
-        incompatibleTokens: ['t', 'T']
-      },
-      // Fraction of second
-      S: {
-        priority: 30,
-        parse: function (string, token, _match, _options) {
-          var valueCallback = function (value) {
-            return Math.floor(value * Math.pow(10, -token.length + 3));
-          };
-
-          return parseNDigits(token.length, string, valueCallback);
-        },
-        set: function (date, _flags, value, _options) {
-          date.setUTCMilliseconds(value);
-          return date;
-        },
-        incompatibleTokens: ['t', 'T']
-      },
-      // Timezone (ISO-8601. +00:00 is `'Z'`)
-      X: {
-        priority: 10,
-        parse: function (string, token, _match, _options) {
-          switch (token) {
-            case 'X':
-              return parseTimezonePattern(timezonePatterns.basicOptionalMinutes, string);
-
-            case 'XX':
-              return parseTimezonePattern(timezonePatterns.basic, string);
-
-            case 'XXXX':
-              return parseTimezonePattern(timezonePatterns.basicOptionalSeconds, string);
-
-            case 'XXXXX':
-              return parseTimezonePattern(timezonePatterns.extendedOptionalSeconds, string);
-
-            case 'XXX':
-            default:
-              return parseTimezonePattern(timezonePatterns.extended, string);
-          }
-        },
-        set: function (date, flags, value, _options) {
-          if (flags.timestampIsSet) {
-            return date;
-          }
-
-          return new Date(date.getTime() - value);
-        },
-        incompatibleTokens: ['t', 'T', 'x']
-      },
-      // Timezone (ISO-8601)
-      x: {
-        priority: 10,
-        parse: function (string, token, _match, _options) {
-          switch (token) {
-            case 'x':
-              return parseTimezonePattern(timezonePatterns.basicOptionalMinutes, string);
-
-            case 'xx':
-              return parseTimezonePattern(timezonePatterns.basic, string);
-
-            case 'xxxx':
-              return parseTimezonePattern(timezonePatterns.basicOptionalSeconds, string);
-
-            case 'xxxxx':
-              return parseTimezonePattern(timezonePatterns.extendedOptionalSeconds, string);
-
-            case 'xxx':
-            default:
-              return parseTimezonePattern(timezonePatterns.extended, string);
-          }
-        },
-        set: function (date, flags, value, _options) {
-          if (flags.timestampIsSet) {
-            return date;
-          }
-
-          return new Date(date.getTime() - value);
-        },
-        incompatibleTokens: ['t', 'T', 'X']
-      },
-      // Seconds timestamp
-      t: {
-        priority: 40,
-        parse: function (string, _token, _match, _options) {
-          return parseAnyDigitsSigned(string);
-        },
-        set: function (_date, _flags, value, _options) {
-          return [new Date(value * 1000), {
-            timestampIsSet: true
-          }];
-        },
-        incompatibleTokens: '*'
-      },
-      // Milliseconds timestamp
-      T: {
-        priority: 20,
-        parse: function (string, _token, _match, _options) {
-          return parseAnyDigitsSigned(string);
-        },
-        set: function (_date, _flags, value, _options) {
-          return [new Date(value), {
-            timestampIsSet: true
-          }];
-        },
-        incompatibleTokens: '*'
-      }
-    };
-
-    var TIMEZONE_UNIT_PRIORITY = 10; // This RegExp consists of three parts separated by `|`:
-    // - [yYQqMLwIdDecihHKkms]o matches any available ordinal number token
-    //   (one of the certain letters followed by `o`)
-    // - (\w)\1* matches any sequences of the same letter
-    // - '' matches two quote characters in a row
-    // - '(''|[^'])+('|$) matches anything surrounded by two quote characters ('),
-    //   except a single quote symbol, which ends the sequence.
-    //   Two quote characters do not end the sequence.
-    //   If there is no matching single quote
-    //   then the sequence will continue until the end of the string.
-    // - . matches any single character unmatched by previous parts of the RegExps
-
-    var formattingTokensRegExp = /[yYQqMLwIdDecihHKkms]o|(\w)\1*|''|'(''|[^'])+('|$)|./g; // This RegExp catches symbols escaped by quotes, and also
-    // sequences of symbols P, p, and the combinations like `PPPPPPPppppp`
-
-    var longFormattingTokensRegExp = /P+p+|P+|p+|''|'(''|[^'])+('|$)|./g;
-    var escapedStringRegExp = /^'([^]*?)'?$/;
-    var doubleQuoteRegExp = /''/g;
-    var notWhitespaceRegExp = /\S/;
-    var unescapedLatinCharacterRegExp = /[a-zA-Z]/;
-    /**
-     * @name parse
-     * @category Common Helpers
-     * @summary Parse the date.
-     *
-     * @description
-     * Return the date parsed from string using the given format string.
-     *
-     * > ⚠️ Please note that the `format` tokens differ from Moment.js and other libraries.
-     * > See: https://git.io/fxCyr
-     *
-     * The characters in the format string wrapped between two single quotes characters (') are escaped.
-     * Two single quotes in a row, whether inside or outside a quoted sequence, represent a 'real' single quote.
-     *
-     * Format of the format string is based on Unicode Technical Standard #35:
-     * https://www.unicode.org/reports/tr35/tr35-dates.html#Date_Field_Symbol_Table
-     * with a few additions (see note 5 below the table).
-     *
-     * Not all tokens are compatible. Combinations that don't make sense or could lead to bugs are prohibited
-     * and will throw `RangeError`. For example usage of 24-hour format token with AM/PM token will throw an exception:
-     *
-     * ```javascript
-     * parse('23 AM', 'HH a', new Date())
-     * //=> RangeError: The format string mustn't contain `HH` and `a` at the same time
-     * ```
-     *
-     * See the compatibility table: https://docs.google.com/spreadsheets/d/e/2PACX-1vQOPU3xUhplll6dyoMmVUXHKl_8CRDs6_ueLmex3SoqwhuolkuN3O05l4rqx5h1dKX8eb46Ul-CCSrq/pubhtml?gid=0&single=true
-     *
-     * Accepted format string patterns:
-     * | Unit                            |Prior| Pattern | Result examples                   | Notes |
-     * |---------------------------------|-----|---------|-----------------------------------|-------|
-     * | Era                             | 140 | G..GGG  | AD, BC                            |       |
-     * |                                 |     | GGGG    | Anno Domini, Before Christ        | 2     |
-     * |                                 |     | GGGGG   | A, B                              |       |
-     * | Calendar year                   | 130 | y       | 44, 1, 1900, 2017, 9999           | 4     |
-     * |                                 |     | yo      | 44th, 1st, 1900th, 9999999th      | 4,5   |
-     * |                                 |     | yy      | 44, 01, 00, 17                    | 4     |
-     * |                                 |     | yyy     | 044, 001, 123, 999                | 4     |
-     * |                                 |     | yyyy    | 0044, 0001, 1900, 2017            | 4     |
-     * |                                 |     | yyyyy   | ...                               | 2,4   |
-     * | Local week-numbering year       | 130 | Y       | 44, 1, 1900, 2017, 9000           | 4     |
-     * |                                 |     | Yo      | 44th, 1st, 1900th, 9999999th      | 4,5   |
-     * |                                 |     | YY      | 44, 01, 00, 17                    | 4,6   |
-     * |                                 |     | YYY     | 044, 001, 123, 999                | 4     |
-     * |                                 |     | YYYY    | 0044, 0001, 1900, 2017            | 4,6   |
-     * |                                 |     | YYYYY   | ...                               | 2,4   |
-     * | ISO week-numbering year         | 130 | R       | -43, 1, 1900, 2017, 9999, -9999   | 4,5   |
-     * |                                 |     | RR      | -43, 01, 00, 17                   | 4,5   |
-     * |                                 |     | RRR     | -043, 001, 123, 999, -999         | 4,5   |
-     * |                                 |     | RRRR    | -0043, 0001, 2017, 9999, -9999    | 4,5   |
-     * |                                 |     | RRRRR   | ...                               | 2,4,5 |
-     * | Extended year                   | 130 | u       | -43, 1, 1900, 2017, 9999, -999    | 4     |
-     * |                                 |     | uu      | -43, 01, 99, -99                  | 4     |
-     * |                                 |     | uuu     | -043, 001, 123, 999, -999         | 4     |
-     * |                                 |     | uuuu    | -0043, 0001, 2017, 9999, -9999    | 4     |
-     * |                                 |     | uuuuu   | ...                               | 2,4   |
-     * | Quarter (formatting)            | 120 | Q       | 1, 2, 3, 4                        |       |
-     * |                                 |     | Qo      | 1st, 2nd, 3rd, 4th                | 5     |
-     * |                                 |     | QQ      | 01, 02, 03, 04                    |       |
-     * |                                 |     | QQQ     | Q1, Q2, Q3, Q4                    |       |
-     * |                                 |     | QQQQ    | 1st quarter, 2nd quarter, ...     | 2     |
-     * |                                 |     | QQQQQ   | 1, 2, 3, 4                        | 4     |
-     * | Quarter (stand-alone)           | 120 | q       | 1, 2, 3, 4                        |       |
-     * |                                 |     | qo      | 1st, 2nd, 3rd, 4th                | 5     |
-     * |                                 |     | qq      | 01, 02, 03, 04                    |       |
-     * |                                 |     | qqq     | Q1, Q2, Q3, Q4                    |       |
-     * |                                 |     | qqqq    | 1st quarter, 2nd quarter, ...     | 2     |
-     * |                                 |     | qqqqq   | 1, 2, 3, 4                        | 3     |
-     * | Month (formatting)              | 110 | M       | 1, 2, ..., 12                     |       |
-     * |                                 |     | Mo      | 1st, 2nd, ..., 12th               | 5     |
-     * |                                 |     | MM      | 01, 02, ..., 12                   |       |
-     * |                                 |     | MMM     | Jan, Feb, ..., Dec                |       |
-     * |                                 |     | MMMM    | January, February, ..., December  | 2     |
-     * |                                 |     | MMMMM   | J, F, ..., D                      |       |
-     * | Month (stand-alone)             | 110 | L       | 1, 2, ..., 12                     |       |
-     * |                                 |     | Lo      | 1st, 2nd, ..., 12th               | 5     |
-     * |                                 |     | LL      | 01, 02, ..., 12                   |       |
-     * |                                 |     | LLL     | Jan, Feb, ..., Dec                |       |
-     * |                                 |     | LLLL    | January, February, ..., December  | 2     |
-     * |                                 |     | LLLLL   | J, F, ..., D                      |       |
-     * | Local week of year              | 100 | w       | 1, 2, ..., 53                     |       |
-     * |                                 |     | wo      | 1st, 2nd, ..., 53th               | 5     |
-     * |                                 |     | ww      | 01, 02, ..., 53                   |       |
-     * | ISO week of year                | 100 | I       | 1, 2, ..., 53                     | 5     |
-     * |                                 |     | Io      | 1st, 2nd, ..., 53th               | 5     |
-     * |                                 |     | II      | 01, 02, ..., 53                   | 5     |
-     * | Day of month                    |  90 | d       | 1, 2, ..., 31                     |       |
-     * |                                 |     | do      | 1st, 2nd, ..., 31st               | 5     |
-     * |                                 |     | dd      | 01, 02, ..., 31                   |       |
-     * | Day of year                     |  90 | D       | 1, 2, ..., 365, 366               | 7     |
-     * |                                 |     | Do      | 1st, 2nd, ..., 365th, 366th       | 5     |
-     * |                                 |     | DD      | 01, 02, ..., 365, 366             | 7     |
-     * |                                 |     | DDD     | 001, 002, ..., 365, 366           |       |
-     * |                                 |     | DDDD    | ...                               | 2     |
-     * | Day of week (formatting)        |  90 | E..EEE  | Mon, Tue, Wed, ..., Sun           |       |
-     * |                                 |     | EEEE    | Monday, Tuesday, ..., Sunday      | 2     |
-     * |                                 |     | EEEEE   | M, T, W, T, F, S, S               |       |
-     * |                                 |     | EEEEEE  | Mo, Tu, We, Th, Fr, Su, Sa        |       |
-     * | ISO day of week (formatting)    |  90 | i       | 1, 2, 3, ..., 7                   | 5     |
-     * |                                 |     | io      | 1st, 2nd, ..., 7th                | 5     |
-     * |                                 |     | ii      | 01, 02, ..., 07                   | 5     |
-     * |                                 |     | iii     | Mon, Tue, Wed, ..., Sun           | 5     |
-     * |                                 |     | iiii    | Monday, Tuesday, ..., Sunday      | 2,5   |
-     * |                                 |     | iiiii   | M, T, W, T, F, S, S               | 5     |
-     * |                                 |     | iiiiii  | Mo, Tu, We, Th, Fr, Su, Sa        | 5     |
-     * | Local day of week (formatting)  |  90 | e       | 2, 3, 4, ..., 1                   |       |
-     * |                                 |     | eo      | 2nd, 3rd, ..., 1st                | 5     |
-     * |                                 |     | ee      | 02, 03, ..., 01                   |       |
-     * |                                 |     | eee     | Mon, Tue, Wed, ..., Sun           |       |
-     * |                                 |     | eeee    | Monday, Tuesday, ..., Sunday      | 2     |
-     * |                                 |     | eeeee   | M, T, W, T, F, S, S               |       |
-     * |                                 |     | eeeeee  | Mo, Tu, We, Th, Fr, Su, Sa        |       |
-     * | Local day of week (stand-alone) |  90 | c       | 2, 3, 4, ..., 1                   |       |
-     * |                                 |     | co      | 2nd, 3rd, ..., 1st                | 5     |
-     * |                                 |     | cc      | 02, 03, ..., 01                   |       |
-     * |                                 |     | ccc     | Mon, Tue, Wed, ..., Sun           |       |
-     * |                                 |     | cccc    | Monday, Tuesday, ..., Sunday      | 2     |
-     * |                                 |     | ccccc   | M, T, W, T, F, S, S               |       |
-     * |                                 |     | cccccc  | Mo, Tu, We, Th, Fr, Su, Sa        |       |
-     * | AM, PM                          |  80 | a..aaa  | AM, PM                            |       |
-     * |                                 |     | aaaa    | a.m., p.m.                        | 2     |
-     * |                                 |     | aaaaa   | a, p                              |       |
-     * | AM, PM, noon, midnight          |  80 | b..bbb  | AM, PM, noon, midnight            |       |
-     * |                                 |     | bbbb    | a.m., p.m., noon, midnight        | 2     |
-     * |                                 |     | bbbbb   | a, p, n, mi                       |       |
-     * | Flexible day period             |  80 | B..BBB  | at night, in the morning, ...     |       |
-     * |                                 |     | BBBB    | at night, in the morning, ...     | 2     |
-     * |                                 |     | BBBBB   | at night, in the morning, ...     |       |
-     * | Hour [1-12]                     |  70 | h       | 1, 2, ..., 11, 12                 |       |
-     * |                                 |     | ho      | 1st, 2nd, ..., 11th, 12th         | 5     |
-     * |                                 |     | hh      | 01, 02, ..., 11, 12               |       |
-     * | Hour [0-23]                     |  70 | H       | 0, 1, 2, ..., 23                  |       |
-     * |                                 |     | Ho      | 0th, 1st, 2nd, ..., 23rd          | 5     |
-     * |                                 |     | HH      | 00, 01, 02, ..., 23               |       |
-     * | Hour [0-11]                     |  70 | K       | 1, 2, ..., 11, 0                  |       |
-     * |                                 |     | Ko      | 1st, 2nd, ..., 11th, 0th          | 5     |
-     * |                                 |     | KK      | 01, 02, ..., 11, 00               |       |
-     * | Hour [1-24]                     |  70 | k       | 24, 1, 2, ..., 23                 |       |
-     * |                                 |     | ko      | 24th, 1st, 2nd, ..., 23rd         | 5     |
-     * |                                 |     | kk      | 24, 01, 02, ..., 23               |       |
-     * | Minute                          |  60 | m       | 0, 1, ..., 59                     |       |
-     * |                                 |     | mo      | 0th, 1st, ..., 59th               | 5     |
-     * |                                 |     | mm      | 00, 01, ..., 59                   |       |
-     * | Second                          |  50 | s       | 0, 1, ..., 59                     |       |
-     * |                                 |     | so      | 0th, 1st, ..., 59th               | 5     |
-     * |                                 |     | ss      | 00, 01, ..., 59                   |       |
-     * | Seconds timestamp               |  40 | t       | 512969520                         |       |
-     * |                                 |     | tt      | ...                               | 2     |
-     * | Fraction of second              |  30 | S       | 0, 1, ..., 9                      |       |
-     * |                                 |     | SS      | 00, 01, ..., 99                   |       |
-     * |                                 |     | SSS     | 000, 0001, ..., 999               |       |
-     * |                                 |     | SSSS    | ...                               | 2     |
-     * | Milliseconds timestamp          |  20 | T       | 512969520900                      |       |
-     * |                                 |     | TT      | ...                               | 2     |
-     * | Timezone (ISO-8601 w/ Z)        |  10 | X       | -08, +0530, Z                     |       |
-     * |                                 |     | XX      | -0800, +0530, Z                   |       |
-     * |                                 |     | XXX     | -08:00, +05:30, Z                 |       |
-     * |                                 |     | XXXX    | -0800, +0530, Z, +123456          | 2     |
-     * |                                 |     | XXXXX   | -08:00, +05:30, Z, +12:34:56      |       |
-     * | Timezone (ISO-8601 w/o Z)       |  10 | x       | -08, +0530, +00                   |       |
-     * |                                 |     | xx      | -0800, +0530, +0000               |       |
-     * |                                 |     | xxx     | -08:00, +05:30, +00:00            | 2     |
-     * |                                 |     | xxxx    | -0800, +0530, +0000, +123456      |       |
-     * |                                 |     | xxxxx   | -08:00, +05:30, +00:00, +12:34:56 |       |
-     * | Long localized date             |  NA | P       | 05/29/1453                        | 5,8   |
-     * |                                 |     | PP      | May 29, 1453                      |       |
-     * |                                 |     | PPP     | May 29th, 1453                    |       |
-     * |                                 |     | PPPP    | Sunday, May 29th, 1453            | 2,5,8 |
-     * | Long localized time             |  NA | p       | 12:00 AM                          | 5,8   |
-     * |                                 |     | pp      | 12:00:00 AM                       |       |
-     * | Combination of date and time    |  NA | Pp      | 05/29/1453, 12:00 AM              |       |
-     * |                                 |     | PPpp    | May 29, 1453, 12:00:00 AM         |       |
-     * |                                 |     | PPPpp   | May 29th, 1453 at ...             |       |
-     * |                                 |     | PPPPpp  | Sunday, May 29th, 1453 at ...     | 2,5,8 |
-     * Notes:
-     * 1. "Formatting" units (e.g. formatting quarter) in the default en-US locale
-     *    are the same as "stand-alone" units, but are different in some languages.
-     *    "Formatting" units are declined according to the rules of the language
-     *    in the context of a date. "Stand-alone" units are always nominative singular.
-     *    In `format` function, they will produce different result:
-     *
-     *    `format(new Date(2017, 10, 6), 'do LLLL', {locale: cs}) //=> '6. listopad'`
-     *
-     *    `format(new Date(2017, 10, 6), 'do MMMM', {locale: cs}) //=> '6. listopadu'`
-     *
-     *    `parse` will try to match both formatting and stand-alone units interchangably.
-     *
-     * 2. Any sequence of the identical letters is a pattern, unless it is escaped by
-     *    the single quote characters (see below).
-     *    If the sequence is longer than listed in table:
-     *    - for numerical units (`yyyyyyyy`) `parse` will try to match a number
-     *      as wide as the sequence
-     *    - for text units (`MMMMMMMM`) `parse` will try to match the widest variation of the unit.
-     *      These variations are marked with "2" in the last column of the table.
-     *
-     * 3. `QQQQQ` and `qqqqq` could be not strictly numerical in some locales.
-     *    These tokens represent the shortest form of the quarter.
-     *
-     * 4. The main difference between `y` and `u` patterns are B.C. years:
-     *
-     *    | Year | `y` | `u` |
-     *    |------|-----|-----|
-     *    | AC 1 |   1 |   1 |
-     *    | BC 1 |   1 |   0 |
-     *    | BC 2 |   2 |  -1 |
-     *
-     *    Also `yy` will try to guess the century of two digit year by proximity with `referenceDate`:
-     *
-     *    `parse('50', 'yy', new Date(2018, 0, 1)) //=> Sat Jan 01 2050 00:00:00`
-     *
-     *    `parse('75', 'yy', new Date(2018, 0, 1)) //=> Wed Jan 01 1975 00:00:00`
-     *
-     *    while `uu` will just assign the year as is:
-     *
-     *    `parse('50', 'uu', new Date(2018, 0, 1)) //=> Sat Jan 01 0050 00:00:00`
-     *
-     *    `parse('75', 'uu', new Date(2018, 0, 1)) //=> Tue Jan 01 0075 00:00:00`
-     *
-     *    The same difference is true for local and ISO week-numbering years (`Y` and `R`),
-     *    except local week-numbering years are dependent on `options.weekStartsOn`
-     *    and `options.firstWeekContainsDate` (compare [setISOWeekYear]{@link https://date-fns.org/docs/setISOWeekYear}
-     *    and [setWeekYear]{@link https://date-fns.org/docs/setWeekYear}).
-     *
-     * 5. These patterns are not in the Unicode Technical Standard #35:
-     *    - `i`: ISO day of week
-     *    - `I`: ISO week of year
-     *    - `R`: ISO week-numbering year
-     *    - `o`: ordinal number modifier
-     *    - `P`: long localized date
-     *    - `p`: long localized time
-     *
-     * 6. `YY` and `YYYY` tokens represent week-numbering years but they are often confused with years.
-     *    You should enable `options.useAdditionalWeekYearTokens` to use them. See: https://git.io/fxCyr
-     *
-     * 7. `D` and `DD` tokens represent days of the year but they are ofthen confused with days of the month.
-     *    You should enable `options.useAdditionalDayOfYearTokens` to use them. See: https://git.io/fxCyr
-     *
-     * 8. `P+` tokens do not have a defined priority since they are merely aliases to other tokens based
-     *    on the given locale.
-     *
-     *    using `en-US` locale: `P` => `MM/dd/yyyy`
-     *    using `en-US` locale: `p` => `hh:mm a`
-     *    using `pt-BR` locale: `P` => `dd/MM/yyyy`
-     *    using `pt-BR` locale: `p` => `HH:mm`
-     *
-     * Values will be assigned to the date in the descending order of its unit's priority.
-     * Units of an equal priority overwrite each other in the order of appearance.
-     *
-     * If no values of higher priority are parsed (e.g. when parsing string 'January 1st' without a year),
-     * the values will be taken from 3rd argument `referenceDate` which works as a context of parsing.
-     *
-     * `referenceDate` must be passed for correct work of the function.
-     * If you're not sure which `referenceDate` to supply, create a new instance of Date:
-     * `parse('02/11/2014', 'MM/dd/yyyy', new Date())`
-     * In this case parsing will be done in the context of the current date.
-     * If `referenceDate` is `Invalid Date` or a value not convertible to valid `Date`,
-     * then `Invalid Date` will be returned.
-     *
-     * The result may vary by locale.
-     *
-     * If `formatString` matches with `dateString` but does not provides tokens, `referenceDate` will be returned.
-     *
-     * If parsing failed, `Invalid Date` will be returned.
-     * Invalid Date is a Date, whose time value is NaN.
-     * Time value of Date: http://es5.github.io/#x15.9.1.1
-     *
-     * ### v2.0.0 breaking changes:
-     *
-     * - [Changes that are common for the whole library](https://github.com/date-fns/date-fns/blob/master/docs/upgradeGuide.md#Common-Changes).
-     *
-     * - Old `parse` was renamed to `toDate`.
-     *   Now `parse` is a new function which parses a string using a provided format.
-     *
-     *   ```javascript
-     *   // Before v2.0.0
-     *   parse('2016-01-01')
-     *
-     *   // v2.0.0 onward (toDate no longer accepts a string)
-     *   toDate(1392098430000) // Unix to timestamp
-     *   toDate(new Date(2014, 1, 11, 11, 30, 30)) // Cloning the date
-     *   parse('2016-01-01', 'yyyy-MM-dd', new Date())
-     *   ```
-     *
-     * @param {String} dateString - the string to parse
-     * @param {String} formatString - the string of tokens
-     * @param {Date|Number} referenceDate - defines values missing from the parsed dateString
-     * @param {Object} [options] - an object with options.
-     * @param {Locale} [options.locale=defaultLocale] - the locale object. See [Locale]{@link https://date-fns.org/docs/Locale}
-     * @param {0|1|2|3|4|5|6} [options.weekStartsOn=0] - the index of the first day of the week (0 - Sunday)
-     * @param {1|2|3|4|5|6|7} [options.firstWeekContainsDate=1] - the day of January, which is always in the first week of the year
-     * @param {Boolean} [options.useAdditionalWeekYearTokens=false] - if true, allows usage of the week-numbering year tokens `YY` and `YYYY`;
-     *   see: https://git.io/fxCyr
-     * @param {Boolean} [options.useAdditionalDayOfYearTokens=false] - if true, allows usage of the day of year tokens `D` and `DD`;
-     *   see: https://git.io/fxCyr
-     * @returns {Date} the parsed date
-     * @throws {TypeError} 3 arguments required
-     * @throws {RangeError} `options.weekStartsOn` must be between 0 and 6
-     * @throws {RangeError} `options.firstWeekContainsDate` must be between 1 and 7
-     * @throws {RangeError} `options.locale` must contain `match` property
-     * @throws {RangeError} use `yyyy` instead of `YYYY` for formatting years using [format provided] to the input [input provided]; see: https://git.io/fxCyr
-     * @throws {RangeError} use `yy` instead of `YY` for formatting years using [format provided] to the input [input provided]; see: https://git.io/fxCyr
-     * @throws {RangeError} use `d` instead of `D` for formatting days of the month using [format provided] to the input [input provided]; see: https://git.io/fxCyr
-     * @throws {RangeError} use `dd` instead of `DD` for formatting days of the month using [format provided] to the input [input provided]; see: https://git.io/fxCyr
-     * @throws {RangeError} format string contains an unescaped latin alphabet character
-     *
-     * @example
-     * // Parse 11 February 2014 from middle-endian format:
-     * var result = parse('02/11/2014', 'MM/dd/yyyy', new Date())
-     * //=> Tue Feb 11 2014 00:00:00
-     *
-     * @example
-     * // Parse 28th of February in Esperanto locale in the context of 2010 year:
-     * import eo from 'date-fns/locale/eo'
-     * var result = parse('28-a de februaro', "do 'de' MMMM", new Date(2010, 0, 1), {
-     *   locale: eo
-     * })
-     * //=> Sun Feb 28 2010 00:00:00
-     */
-
-    function parse(dirtyDateString, dirtyFormatString, dirtyReferenceDate, dirtyOptions) {
-      requiredArgs(3, arguments);
-      var dateString = String(dirtyDateString);
-      var formatString = String(dirtyFormatString);
-      var options = dirtyOptions || {};
-      var locale$1 = options.locale || locale;
-
-      if (!locale$1.match) {
-        throw new RangeError('locale must contain match property');
-      }
-
-      var localeFirstWeekContainsDate = locale$1.options && locale$1.options.firstWeekContainsDate;
-      var defaultFirstWeekContainsDate = localeFirstWeekContainsDate == null ? 1 : toInteger(localeFirstWeekContainsDate);
-      var firstWeekContainsDate = options.firstWeekContainsDate == null ? defaultFirstWeekContainsDate : toInteger(options.firstWeekContainsDate); // Test if weekStartsOn is between 1 and 7 _and_ is not NaN
-
-      if (!(firstWeekContainsDate >= 1 && firstWeekContainsDate <= 7)) {
-        throw new RangeError('firstWeekContainsDate must be between 1 and 7 inclusively');
-      }
-
-      var localeWeekStartsOn = locale$1.options && locale$1.options.weekStartsOn;
-      var defaultWeekStartsOn = localeWeekStartsOn == null ? 0 : toInteger(localeWeekStartsOn);
-      var weekStartsOn = options.weekStartsOn == null ? defaultWeekStartsOn : toInteger(options.weekStartsOn); // Test if weekStartsOn is between 0 and 6 _and_ is not NaN
-
-      if (!(weekStartsOn >= 0 && weekStartsOn <= 6)) {
-        throw new RangeError('weekStartsOn must be between 0 and 6 inclusively');
-      }
-
-      if (formatString === '') {
-        if (dateString === '') {
-          return toDate(dirtyReferenceDate);
-        } else {
-          return new Date(NaN);
-        }
-      }
-
-      var subFnOptions = {
-        firstWeekContainsDate: firstWeekContainsDate,
-        weekStartsOn: weekStartsOn,
-        locale: locale$1 // If timezone isn't specified, it will be set to the system timezone
-
-      };
-      var setters = [{
-        priority: TIMEZONE_UNIT_PRIORITY,
-        subPriority: -1,
-        set: dateToSystemTimezone,
-        index: 0
-      }];
-      var i;
-      var tokens = formatString.match(longFormattingTokensRegExp).map(function (substring) {
-        var firstCharacter = substring[0];
-
-        if (firstCharacter === 'p' || firstCharacter === 'P') {
-          var longFormatter = longFormatters[firstCharacter];
-          return longFormatter(substring, locale$1.formatLong, subFnOptions);
-        }
-
-        return substring;
-      }).join('').match(formattingTokensRegExp);
-      var usedTokens = [];
-
-      for (i = 0; i < tokens.length; i++) {
-        var token = tokens[i];
-
-        if (!options.useAdditionalWeekYearTokens && isProtectedWeekYearToken(token)) {
-          throwProtectedError(token, formatString, dirtyDateString);
-        }
-
-        if (!options.useAdditionalDayOfYearTokens && isProtectedDayOfYearToken(token)) {
-          throwProtectedError(token, formatString, dirtyDateString);
-        }
-
-        var firstCharacter = token[0];
-        var parser = parsers[firstCharacter];
-
-        if (parser) {
-          var incompatibleTokens = parser.incompatibleTokens;
-
-          if (Array.isArray(incompatibleTokens)) {
-            var incompatibleToken = void 0;
-
-            for (var _i = 0; _i < usedTokens.length; _i++) {
-              var usedToken = usedTokens[_i].token;
-
-              if (incompatibleTokens.indexOf(usedToken) !== -1 || usedToken === firstCharacter) {
-                incompatibleToken = usedTokens[_i];
-                break;
-              }
-            }
-
-            if (incompatibleToken) {
-              throw new RangeError("The format string mustn't contain `".concat(incompatibleToken.fullToken, "` and `").concat(token, "` at the same time"));
-            }
-          } else if (parser.incompatibleTokens === '*' && usedTokens.length) {
-            throw new RangeError("The format string mustn't contain `".concat(token, "` and any other token at the same time"));
-          }
-
-          usedTokens.push({
-            token: firstCharacter,
-            fullToken: token
-          });
-          var parseResult = parser.parse(dateString, token, locale$1.match, subFnOptions);
-
-          if (!parseResult) {
-            return new Date(NaN);
-          }
-
-          setters.push({
-            priority: parser.priority,
-            subPriority: parser.subPriority || 0,
-            set: parser.set,
-            validate: parser.validate,
-            value: parseResult.value,
-            index: setters.length
-          });
-          dateString = parseResult.rest;
-        } else {
-          if (firstCharacter.match(unescapedLatinCharacterRegExp)) {
-            throw new RangeError('Format string contains an unescaped latin alphabet character `' + firstCharacter + '`');
-          } // Replace two single quote characters with one single quote character
-
-
-          if (token === "''") {
-            token = "'";
-          } else if (firstCharacter === "'") {
-            token = cleanEscapedString(token);
-          } // Cut token from string, or, if string doesn't match the token, return Invalid Date
-
-
-          if (dateString.indexOf(token) === 0) {
-            dateString = dateString.slice(token.length);
-          } else {
-            return new Date(NaN);
-          }
-        }
-      } // Check if the remaining input contains something other than whitespace
-
-
-      if (dateString.length > 0 && notWhitespaceRegExp.test(dateString)) {
-        return new Date(NaN);
-      }
-
-      var uniquePrioritySetters = setters.map(function (setter) {
-        return setter.priority;
-      }).sort(function (a, b) {
-        return b - a;
-      }).filter(function (priority, index, array) {
-        return array.indexOf(priority) === index;
-      }).map(function (priority) {
-        return setters.filter(function (setter) {
-          return setter.priority === priority;
-        }).sort(function (a, b) {
-          return b.subPriority - a.subPriority;
-        });
-      }).map(function (setterArray) {
-        return setterArray[0];
-      });
-      var date = toDate(dirtyReferenceDate);
-
-      if (isNaN(date)) {
-        return new Date(NaN);
-      } // Convert the date in system timezone to the same date in UTC+00:00 timezone.
-      // This ensures that when UTC functions will be implemented, locales will be compatible with them.
-      // See an issue about UTC functions: https://github.com/date-fns/date-fns/issues/37
-
-
-      var utcDate = subMilliseconds(date, getTimezoneOffsetInMilliseconds(date));
-      var flags = {};
-
-      for (i = 0; i < uniquePrioritySetters.length; i++) {
-        var setter = uniquePrioritySetters[i];
-
-        if (setter.validate && !setter.validate(utcDate, setter.value, subFnOptions)) {
-          return new Date(NaN);
-        }
-
-        var result = setter.set(utcDate, flags, setter.value, subFnOptions); // Result is tuple (date, flags)
-
-        if (result[0]) {
-          utcDate = result[0];
-          assign(flags, result[1]); // Result is date
-        } else {
-          utcDate = result;
-        }
-      }
-
-      return utcDate;
-    }
-
-    function dateToSystemTimezone(date, flags) {
-      if (flags.timestampIsSet) {
-        return date;
-      }
-
-      var convertedDate = new Date(0);
-      convertedDate.setFullYear(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-      convertedDate.setHours(date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds(), date.getUTCMilliseconds());
-      return convertedDate;
-    }
-
-    function cleanEscapedString(input) {
-      return input.match(escapedStringRegExp)[1].replace(doubleQuoteRegExp, "'");
-    }
-
     /**
      * @name subHours
      * @category Hour Helpers
@@ -86507,27 +84418,37 @@
 
     class TransactionsService {
         fetchPriceLast24Hours() {
-            return request(`/transactions/price-24hours`, "GET");
+            return { data: 1.2 };
         }
         fetchPriceHistory(interval, scale) {
-            return request(`/transactions/price-history/${interval}/${scale}`, "GET");
+            const data = new Array();
+            for (let i = 0; i < scale; i++)
+                data.push(Math.random() * 1.2);
+            return { data };
         }
         fetchEnergyHistory(interval, scale) {
-            return request(`/transactions/energy-history/${interval}/${scale}`, "GET");
+            const data = new Array();
+            for (let i = 0; i < scale; i++)
+                data.push(Math.random() * 1.2);
+            return { data };
         }
         fetchEnergyFlow(start, end) {
-            const formatedStart = format(start, "MM-dd-yyyy HH:mm:ss");
-            const formatedEnd = format(end, "MM-dd-yyyy HH:mm:ss");
-            return request(`/transactions/energy-flow/${formatedStart}/${formatedEnd}`, "GET");
+            format(start, "MM-dd-yyyy HH:mm:ss");
+            format(end, "MM-dd-yyyy HH:mm:ss");
+            return {
+                data: {
+                    energyFromCommunity: 100,
+                    energyFromPublicGrid: 20,
+                    energyToCommunity: 120,
+                    energyToPublicGrid: 80,
+                },
+            };
         }
     }
 
     class UsersService {
-        async updatePrices(prices) {
-            return request("/users/prices", "PUT", prices);
-        }
         async fetchPrices() {
-            return request("/users/prices", "GET");
+            return { data: { buyPrice: 1.2, sellPrice: 1.18 } };
         }
     }
 
@@ -86539,9 +84460,9 @@
     const transactionsService = new TransactionsService();
 
     /* src/auth/routes/Login.svelte generated by Svelte v3.37.0 */
-    const file$u = "src/auth/routes/Login.svelte";
+    const file$v = "src/auth/routes/Login.svelte";
 
-    function create_fragment$u(ctx) {
+    function create_fragment$v(ctx) {
     	let div12;
     	let div0;
     	let img;
@@ -86621,65 +84542,65 @@
     			attr_dev(img, "class", "mx-auto h-12 w-auto");
     			if (img.src !== (img_src_value = "https://energify.pt/logo-small.png")) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "alt", "Workflow");
-    			add_location(img, file$u, 25, 4, 1229);
+    			add_location(img, file$v, 25, 4, 1229);
     			attr_dev(h2, "class", "mt-6 text-center text-3xl font-extrabold text-gray-900");
-    			add_location(h2, file$u, 26, 4, 1325);
+    			add_location(h2, file$v, 26, 4, 1325);
     			attr_dev(div0, "class", "sm:mx-auto sm:w-full sm:max-w-md");
-    			add_location(div0, file$u, 24, 2, 1178);
+    			add_location(div0, file$v, 24, 2, 1178);
     			attr_dev(label0, "for", "email");
     			attr_dev(label0, "class", "block text-sm font-medium text-gray-700");
-    			add_location(label0, file$u, 33, 10, 1606);
+    			add_location(label0, file$v, 33, 10, 1606);
     			attr_dev(input0, "id", "email");
     			attr_dev(input0, "name", "email");
     			attr_dev(input0, "autocomplete", "off");
     			attr_dev(input0, "type", "email");
     			input0.required = true;
     			attr_dev(input0, "class", "input");
-    			add_location(input0, file$u, 35, 12, 1738);
+    			add_location(input0, file$v, 35, 12, 1738);
     			attr_dev(div1, "class", "mt-1");
-    			add_location(div1, file$u, 34, 10, 1707);
-    			add_location(div2, file$u, 32, 8, 1590);
+    			add_location(div1, file$v, 34, 10, 1707);
+    			add_location(div2, file$v, 32, 8, 1590);
     			attr_dev(label1, "for", "password");
     			attr_dev(label1, "class", "block text-sm font-medium text-gray-700");
-    			add_location(label1, file$u, 48, 10, 2027);
+    			add_location(label1, file$v, 48, 10, 2027);
     			attr_dev(input1, "id", "password");
     			attr_dev(input1, "name", "password");
     			attr_dev(input1, "type", "password");
     			input1.required = true;
     			attr_dev(input1, "class", "input");
-    			add_location(input1, file$u, 50, 12, 2157);
+    			add_location(input1, file$v, 50, 12, 2157);
     			attr_dev(div3, "class", "mt-1");
-    			add_location(div3, file$u, 49, 10, 2126);
-    			add_location(div4, file$u, 47, 8, 2011);
+    			add_location(div3, file$v, 49, 10, 2126);
+    			add_location(div4, file$v, 47, 8, 2011);
     			attr_dev(input2, "id", "remember_me");
     			attr_dev(input2, "name", "remember_me");
     			attr_dev(input2, "type", "checkbox");
     			attr_dev(input2, "class", "h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded");
-    			add_location(input2, file$u, 63, 12, 2511);
+    			add_location(input2, file$v, 63, 12, 2511);
     			attr_dev(label2, "for", "remember_me");
     			attr_dev(label2, "class", "ml-2 block text-sm text-gray-900");
-    			add_location(label2, file$u, 69, 12, 2729);
+    			add_location(label2, file$v, 69, 12, 2729);
     			attr_dev(div5, "class", "flex items-center");
-    			add_location(div5, file$u, 62, 10, 2467);
+    			add_location(div5, file$v, 62, 10, 2467);
     			attr_dev(a, "href", "#");
     			attr_dev(a, "class", "font-medium text-green-600 hover:text-green-500");
-    			add_location(a, file$u, 73, 12, 2879);
+    			add_location(a, file$v, 73, 12, 2879);
     			attr_dev(div6, "class", "text-sm");
-    			add_location(div6, file$u, 72, 10, 2845);
+    			add_location(div6, file$v, 72, 10, 2845);
     			attr_dev(div7, "class", "flex items-center justify-between");
-    			add_location(div7, file$u, 61, 8, 2409);
+    			add_location(div7, file$v, 61, 8, 2409);
     			attr_dev(button, "type", "submit");
     			attr_dev(button, "class", "w-full flex justify-center btn");
-    			add_location(button, file$u, 80, 10, 3058);
-    			add_location(div8, file$u, 79, 8, 3042);
+    			add_location(button, file$v, 80, 10, 3058);
+    			add_location(div8, file$v, 79, 8, 3042);
     			attr_dev(div9, "class", "space-y-6");
-    			add_location(div9, file$u, 31, 6, 1558);
+    			add_location(div9, file$v, 31, 6, 1558);
     			attr_dev(div10, "class", "bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10");
-    			add_location(div10, file$u, 30, 4, 1489);
+    			add_location(div10, file$v, 30, 4, 1489);
     			attr_dev(div11, "class", "mt-8 sm:mx-auto sm:w-full sm:max-w-md");
-    			add_location(div11, file$u, 29, 2, 1433);
+    			add_location(div11, file$v, 29, 2, 1433);
     			attr_dev(div12, "class", "min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8");
-    			add_location(div12, file$u, 23, 0, 1087);
+    			add_location(div12, file$v, 23, 0, 1087);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -86750,7 +84671,7 @@
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$u.name,
+    		id: create_fragment$v.name,
     		type: "component",
     		source: "",
     		ctx
@@ -86759,7 +84680,7 @@
     	return block;
     }
 
-    function instance$u($$self, $$props, $$invalidate) {
+    function instance$v($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("Login", slots, []);
 
@@ -86851,21 +84772,21 @@
     class Login extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$u, create_fragment$u, safe_not_equal, {});
+    		init(this, options, instance$v, create_fragment$v, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Login",
     			options,
-    			id: create_fragment$u.name
+    			id: create_fragment$v.name
     		});
     	}
     }
 
     /* src/auth/routes/Register.svelte generated by Svelte v3.37.0 */
-    const file$t = "src/auth/routes/Register.svelte";
+    const file$u = "src/auth/routes/Register.svelte";
 
-    function create_fragment$t(ctx) {
+    function create_fragment$u(ctx) {
     	let div14;
     	let div0;
     	let img;
@@ -86964,81 +84885,81 @@
     			attr_dev(img, "class", "mx-auto h-12 w-auto");
     			if (img.src !== (img_src_value = "https://energify.pt/logo-small.png")) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "alt", "Workflow");
-    			add_location(img, file$t, 31, 4, 1304);
+    			add_location(img, file$u, 31, 4, 1304);
     			attr_dev(h2, "class", "mt-6 text-center text-3xl font-extrabold text-gray-900");
-    			add_location(h2, file$t, 32, 4, 1400);
+    			add_location(h2, file$u, 32, 4, 1400);
     			attr_dev(div0, "class", "sm:mx-auto sm:w-full sm:max-w-md");
-    			add_location(div0, file$t, 30, 2, 1253);
+    			add_location(div0, file$u, 30, 2, 1253);
     			attr_dev(label0, "for", "name");
     			attr_dev(label0, "class", "block text-sm font-medium text-gray-700");
-    			add_location(label0, file$t, 39, 10, 1721);
+    			add_location(label0, file$u, 39, 10, 1721);
     			attr_dev(input0, "id", "name");
     			attr_dev(input0, "name", "name");
     			input0.required = true;
     			attr_dev(input0, "class", "input");
-    			add_location(input0, file$t, 41, 12, 1843);
+    			add_location(input0, file$u, 41, 12, 1843);
     			attr_dev(div1, "class", "mt-1");
-    			add_location(div1, file$t, 40, 10, 1812);
-    			add_location(div2, file$t, 38, 8, 1705);
+    			add_location(div1, file$u, 40, 10, 1812);
+    			add_location(div2, file$u, 38, 8, 1705);
     			attr_dev(label1, "for", "birthday");
     			attr_dev(label1, "class", "block text-sm font-medium text-gray-700");
-    			add_location(label1, file$t, 52, 10, 2072);
+    			add_location(label1, file$u, 52, 10, 2072);
     			attr_dev(input1, "id", "birthday");
     			attr_dev(input1, "type", "date");
     			attr_dev(input1, "name", "birthday");
     			input1.required = true;
     			attr_dev(input1, "class", "input");
-    			add_location(input1, file$t, 54, 12, 2202);
+    			add_location(input1, file$u, 54, 12, 2202);
     			attr_dev(div3, "class", "mt-1");
-    			add_location(div3, file$t, 53, 10, 2171);
-    			add_location(div4, file$t, 51, 8, 2056);
+    			add_location(div3, file$u, 53, 10, 2171);
+    			add_location(div4, file$u, 51, 8, 2056);
     			attr_dev(label2, "for", "email");
     			attr_dev(label2, "class", "block text-sm font-medium text-gray-700");
-    			add_location(label2, file$t, 66, 10, 2469);
+    			add_location(label2, file$u, 66, 10, 2469);
     			attr_dev(input2, "id", "email");
     			attr_dev(input2, "name", "email");
     			attr_dev(input2, "type", "email");
     			input2.required = true;
     			attr_dev(input2, "class", "input");
-    			add_location(input2, file$t, 68, 12, 2601);
+    			add_location(input2, file$u, 68, 12, 2601);
     			attr_dev(div5, "class", "mt-1");
-    			add_location(div5, file$t, 67, 10, 2570);
-    			add_location(div6, file$t, 65, 8, 2453);
+    			add_location(div5, file$u, 67, 10, 2570);
+    			add_location(div6, file$u, 65, 8, 2453);
     			attr_dev(label3, "for", "password");
     			attr_dev(label3, "class", "block text-sm font-medium text-gray-700");
-    			add_location(label3, file$t, 80, 10, 2860);
+    			add_location(label3, file$u, 80, 10, 2860);
     			attr_dev(input3, "id", "password");
     			attr_dev(input3, "name", "password");
     			attr_dev(input3, "type", "password");
     			input3.required = true;
     			attr_dev(input3, "class", "input");
-    			add_location(input3, file$t, 82, 12, 2990);
+    			add_location(input3, file$u, 82, 12, 2990);
     			attr_dev(div7, "class", "mt-1");
-    			add_location(div7, file$t, 81, 10, 2959);
-    			add_location(div8, file$t, 79, 8, 2844);
+    			add_location(div7, file$u, 81, 10, 2959);
+    			add_location(div8, file$u, 79, 8, 2844);
     			attr_dev(label4, "for", "cc");
     			attr_dev(label4, "class", "block text-sm font-medium text-gray-700");
-    			add_location(label4, file$t, 94, 10, 3261);
+    			add_location(label4, file$u, 94, 10, 3261);
     			attr_dev(input4, "id", "cc");
     			attr_dev(input4, "name", "cc");
     			input4.required = true;
     			attr_dev(input4, "class", "input");
-    			add_location(input4, file$t, 96, 12, 3387);
+    			add_location(input4, file$u, 96, 12, 3387);
     			attr_dev(div9, "class", "mt-1");
-    			add_location(div9, file$t, 95, 10, 3356);
-    			add_location(div10, file$t, 93, 8, 3245);
+    			add_location(div9, file$u, 95, 10, 3356);
+    			add_location(div10, file$u, 93, 8, 3245);
     			attr_dev(button, "type", "submit");
     			attr_dev(button, "class", "w-full flex justify-center btn");
-    			add_location(button, file$t, 101, 10, 3528);
-    			add_location(div11, file$t, 100, 8, 3512);
+    			add_location(button, file$u, 101, 10, 3528);
+    			add_location(div11, file$u, 100, 8, 3512);
     			attr_dev(form, "class", "space-y-6");
-    			add_location(form, file$t, 37, 6, 1630);
+    			add_location(form, file$u, 37, 6, 1630);
     			attr_dev(div12, "class", "bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10");
-    			add_location(div12, file$t, 36, 4, 1561);
+    			add_location(div12, file$u, 36, 4, 1561);
     			attr_dev(div13, "class", "mt-8 sm:mx-auto sm:w-full sm:max-w-md");
-    			add_location(div13, file$t, 35, 2, 1505);
+    			add_location(div13, file$u, 35, 2, 1505);
     			attr_dev(div14, "class", "min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8");
-    			add_location(div14, file$t, 29, 0, 1162);
+    			add_location(div14, file$u, 29, 0, 1162);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -87136,7 +85057,7 @@
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$t.name,
+    		id: create_fragment$u.name,
     		type: "component",
     		source: "",
     		ctx
@@ -87145,7 +85066,7 @@
     	return block;
     }
 
-    function instance$t($$self, $$props, $$invalidate) {
+    function instance$u($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("Register", slots, []);
 
@@ -87266,20 +85187,20 @@
     class Register extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$t, create_fragment$t, safe_not_equal, {});
+    		init(this, options, instance$u, create_fragment$u, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Register",
     			options,
-    			id: create_fragment$t.name
+    			id: create_fragment$u.name
     		});
     	}
     }
 
     /* node_modules/svelte-hero-icons/dist/Icon.svelte generated by Svelte v3.37.0 */
 
-    const file$s = "node_modules/svelte-hero-icons/dist/Icon.svelte";
+    const file$t = "node_modules/svelte-hero-icons/dist/Icon.svelte";
 
     function get_each_context_1$1(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -87371,7 +85292,7 @@
     			attr_dev(svg, "class", svg_class_value = "heroicon outline " + /*customClass*/ ctx[3]);
     			attr_dev(svg, "width", /*size*/ ctx[0]);
     			attr_dev(svg, "height", /*size*/ ctx[0]);
-    			add_location(svg, file$s, 37, 4, 759);
+    			add_location(svg, file$t, 37, 4, 759);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, svg, anchor);
@@ -87460,7 +85381,7 @@
     			attr_dev(svg, "class", svg_class_value = "heroicon solid " + /*customClass*/ ctx[3]);
     			attr_dev(svg, "width", /*size*/ ctx[0]);
     			attr_dev(svg, "height", /*size*/ ctx[0]);
-    			add_location(svg, file$s, 23, 4, 446);
+    			add_location(svg, file$t, 23, 4, 446);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, svg, anchor);
@@ -87537,7 +85458,7 @@
     		c: function create() {
     			path = svg_element("path");
     			set_svg_attributes(path, path_data);
-    			add_location(path, file$s, 48, 8, 1037);
+    			add_location(path, file$t, 48, 8, 1037);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, path, anchor);
@@ -87575,7 +85496,7 @@
     		c: function create() {
     			path = svg_element("path");
     			set_svg_attributes(path, path_data);
-    			add_location(path, file$s, 33, 8, 702);
+    			add_location(path, file$t, 33, 8, 702);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, path, anchor);
@@ -87599,7 +85520,7 @@
     	return block;
     }
 
-    function create_fragment$s(ctx) {
+    function create_fragment$t(ctx) {
     	let if_block_anchor;
     	let if_block = /*src*/ ctx[1] && /*src*/ ctx[1] != [] && create_if_block$5(ctx);
 
@@ -87639,7 +85560,7 @@
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$s.name,
+    		id: create_fragment$t.name,
     		type: "component",
     		source: "",
     		ctx
@@ -87648,7 +85569,7 @@
     	return block;
     }
 
-    function instance$s($$self, $$props, $$invalidate) {
+    function instance$t($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("Icon", slots, []);
     	let { src = [] } = $$props;
@@ -87698,13 +85619,13 @@
     class Icon extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$s, create_fragment$s, safe_not_equal, { src: 1, size: 0, solid: 2, class: 3 });
+    		init(this, options, instance$t, create_fragment$t, safe_not_equal, { src: 1, size: 0, solid: 2, class: 3 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Icon",
     			options,
-    			id: create_fragment$s.name
+    			id: create_fragment$t.name
     		});
     	}
 
@@ -87955,7 +85876,7 @@
 
     const { Object: Object_1 } = globals;
 
-    const file$r = "src/auth/routes/Complete.svelte";
+    const file$s = "src/auth/routes/Complete.svelte";
 
     function get_each_context$5(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -87976,7 +85897,7 @@
     			t0 = text(t0_value);
     			t1 = space();
     			attr_dev(div, "class", "flex items-center justify-center bg-gray-100 text-gray-600 px-1 mr-4 \n                rounded-md col-span-3");
-    			add_location(div, file$r, 82, 14, 3393);
+    			add_location(div, file$s, 82, 14, 3393);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -88002,7 +85923,7 @@
     	return block;
     }
 
-    function create_fragment$r(ctx) {
+    function create_fragment$s(ctx) {
     	let div12;
     	let div0;
     	let img;
@@ -88102,53 +86023,53 @@
     			attr_dev(img, "class", "mx-auto h-12 w-auto");
     			if (img.src !== (img_src_value = "https://energify.pt/logo-small.png")) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "alt", "Workflow");
-    			add_location(img, file$r, 41, 4, 1836);
+    			add_location(img, file$s, 41, 4, 1836);
     			attr_dev(h2, "class", "mt-6 text-center text-3xl font-extrabold text-gray-900");
-    			add_location(h2, file$r, 42, 4, 1932);
+    			add_location(h2, file$s, 42, 4, 1932);
     			attr_dev(div0, "class", "sm:mx-auto sm:w-full sm:max-w-md");
-    			add_location(div0, file$r, 40, 2, 1785);
+    			add_location(div0, file$s, 40, 2, 1785);
     			attr_dev(div1, "class", "flex items-center bg-yellow-100 text-yellow-800 p-2 rounded-md \n            text-sm mt-2");
-    			add_location(div1, file$r, 49, 10, 2249);
-    			add_location(div2, file$r, 48, 8, 2233);
+    			add_location(div1, file$s, 49, 10, 2249);
+    			add_location(div2, file$s, 48, 8, 2233);
     			attr_dev(label0, "for", "nif");
     			attr_dev(label0, "class", "block text-sm font-medium text-gray-700");
-    			add_location(label0, file$r, 59, 10, 2571);
+    			add_location(label0, file$s, 59, 10, 2571);
     			attr_dev(input0, "id", "nif");
     			attr_dev(input0, "name", "nif");
     			input0.required = true;
     			attr_dev(input0, "class", "input");
-    			add_location(input0, file$r, 61, 12, 2691);
+    			add_location(input0, file$s, 61, 12, 2691);
     			attr_dev(div3, "class", "mt-1");
-    			add_location(div3, file$r, 60, 10, 2660);
-    			add_location(div4, file$r, 58, 8, 2555);
+    			add_location(div3, file$s, 60, 10, 2660);
+    			add_location(div4, file$s, 58, 8, 2555);
     			attr_dev(label1, "for", "address");
     			attr_dev(label1, "class", "block text-sm font-medium text-gray-700");
-    			add_location(label1, file$r, 66, 10, 2835);
+    			add_location(label1, file$s, 66, 10, 2835);
     			attr_dev(input1, "id", "address");
     			attr_dev(input1, "name", "address");
     			input1.required = true;
     			attr_dev(input1, "class", "input");
-    			add_location(input1, file$r, 68, 12, 2963);
+    			add_location(input1, file$s, 68, 12, 2963);
     			attr_dev(div5, "class", "mt-1");
-    			add_location(div5, file$r, 67, 10, 2932);
-    			add_location(div6, file$r, 65, 8, 2819);
+    			add_location(div5, file$s, 67, 10, 2932);
+    			add_location(div6, file$s, 65, 8, 2819);
     			attr_dev(span, "class", "block text-sm font-medium text-gray-700");
-    			add_location(span, file$r, 79, 10, 3201);
+    			add_location(span, file$s, 79, 10, 3201);
     			attr_dev(div7, "class", "grid grid-cols-12 mt-2 gap-3");
-    			add_location(div7, file$r, 80, 10, 3288);
-    			add_location(div8, file$r, 78, 8, 3185);
+    			add_location(div7, file$s, 80, 10, 3288);
+    			add_location(div8, file$s, 78, 8, 3185);
     			attr_dev(button, "type", "submit");
     			attr_dev(button, "class", "w-full flex justify-center btn");
-    			add_location(button, file$r, 93, 10, 3667);
-    			add_location(div9, file$r, 92, 8, 3651);
+    			add_location(button, file$s, 93, 10, 3667);
+    			add_location(div9, file$s, 92, 8, 3651);
     			attr_dev(form, "class", "space-y-6");
-    			add_location(form, file$r, 47, 6, 2158);
+    			add_location(form, file$s, 47, 6, 2158);
     			attr_dev(div10, "class", "bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10");
-    			add_location(div10, file$r, 46, 4, 2089);
+    			add_location(div10, file$s, 46, 4, 2089);
     			attr_dev(div11, "class", "mt-8 sm:mx-auto sm:w-full sm:max-w-md");
-    			add_location(div11, file$r, 45, 2, 2033);
+    			add_location(div11, file$s, 45, 2, 2033);
     			attr_dev(div12, "class", "min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8");
-    			add_location(div12, file$r, 39, 0, 1694);
+    			add_location(div12, file$s, 39, 0, 1694);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -88259,7 +86180,7 @@
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$r.name,
+    		id: create_fragment$s.name,
     		type: "component",
     		source: "",
     		ctx
@@ -88268,7 +86189,7 @@
     	return block;
     }
 
-    function instance$r($$self, $$props, $$invalidate) {
+    function instance$s($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("Complete", slots, []);
 
@@ -88386,13 +86307,13 @@
     class Complete extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$r, create_fragment$r, safe_not_equal, {});
+    		init(this, options, instance$s, create_fragment$s, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Complete",
     			options,
-    			id: create_fragment$r.name
+    			id: create_fragment$s.name
     		});
     	}
     }
@@ -88416,7 +86337,7 @@
     };
 
     /* src/common/components/notifications/Notification.svelte generated by Svelte v3.37.0 */
-    const file$q = "src/common/components/notifications/Notification.svelte";
+    const file$r = "src/common/components/notifications/Notification.svelte";
 
     // (19:0) {#if isMounted}
     function create_if_block$4(ctx) {
@@ -88486,32 +86407,32 @@
     			toggle_class(div0, "text-green-400", /*notification*/ ctx[0].type === "success");
     			toggle_class(div0, "text-red-400", /*notification*/ ctx[0].type === "error");
     			toggle_class(div0, "text-gray-900", /*notification*/ ctx[0].type === "info");
-    			add_location(div0, file$q, 35, 12, 1175);
+    			add_location(div0, file$r, 35, 12, 1175);
     			attr_dev(p0, "class", "text-sm font-medium text-gray-900");
-    			add_location(p0, file$q, 51, 14, 1786);
+    			add_location(p0, file$r, 51, 14, 1786);
     			attr_dev(p1, "class", "mt-1 text-sm text-gray-500");
-    			add_location(p1, file$q, 52, 14, 1870);
+    			add_location(p1, file$r, 52, 14, 1870);
     			attr_dev(div1, "class", "ml-3 w-0 flex-1 pt-0.5");
-    			add_location(div1, file$q, 50, 12, 1735);
+    			add_location(div1, file$r, 50, 12, 1735);
     			attr_dev(button, "class", "bg-white rounded-md inline-flex text-gray-400 hover:text-gray-500 \n              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500");
-    			add_location(button, file$q, 55, 14, 2022);
+    			add_location(button, file$r, 55, 14, 2022);
     			attr_dev(div2, "class", "ml-4 flex-shrink-0 flex");
-    			add_location(div2, file$q, 54, 12, 1970);
+    			add_location(div2, file$r, 54, 12, 1970);
     			attr_dev(div3, "class", "flex items-start");
-    			add_location(div3, file$q, 34, 10, 1132);
+    			add_location(div3, file$r, 34, 10, 1132);
     			attr_dev(div4, "class", "p-4");
-    			add_location(div4, file$q, 33, 8, 1104);
+    			add_location(div4, file$r, 33, 8, 1104);
     			attr_dev(div5, "class", "max-w-sm w-full bg-white shadow-lg rounded-lg pointer-events-auto ring-1 \n        ring-black ring-opacity-5 overflow-hidden");
-    			add_location(div5, file$q, 29, 6, 943);
+    			add_location(div5, file$r, 29, 6, 943);
 
     			attr_dev(div6, "class", div6_class_value = "w-full flex flex-col items-center space-y-4 sm:items-end\n  transform ease-out duration-300 transition " + (/*isRendered*/ ctx[2]
     			? "translate-y-0 opacity-100 sm:translate-x-0"
     			: "translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"));
 
-    			add_location(div6, file$q, 23, 4, 672);
+    			add_location(div6, file$r, 23, 4, 672);
     			attr_dev(div7, "aria-live", "assertive");
     			attr_dev(div7, "class", "fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 sm:items-start");
-    			add_location(div7, file$q, 19, 2, 540);
+    			add_location(div7, file$r, 19, 2, 540);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div7, anchor);
@@ -88602,7 +86523,7 @@
     	return block;
     }
 
-    function create_fragment$q(ctx) {
+    function create_fragment$r(ctx) {
     	let if_block_anchor;
     	let current;
     	let if_block = /*isMounted*/ ctx[1] && create_if_block$4(ctx);
@@ -88661,7 +86582,7 @@
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$q.name,
+    		id: create_fragment$r.name,
     		type: "component",
     		source: "",
     		ctx
@@ -88670,7 +86591,7 @@
     	return block;
     }
 
-    function instance$q($$self, $$props, $$invalidate) {
+    function instance$r($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("Notification", slots, []);
     	
@@ -88732,13 +86653,13 @@
     class Notification extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$q, create_fragment$q, safe_not_equal, { id: 4, notification: 0 });
+    		init(this, options, instance$r, create_fragment$r, safe_not_equal, { id: 4, notification: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Notification",
     			options,
-    			id: create_fragment$q.name
+    			id: create_fragment$r.name
     		});
 
     		const { ctx } = this.$$;
@@ -88771,7 +86692,7 @@
     }
 
     /* src/common/components/notifications/NotificationManager.svelte generated by Svelte v3.37.0 */
-    const file$p = "src/common/components/notifications/NotificationManager.svelte";
+    const file$q = "src/common/components/notifications/NotificationManager.svelte";
 
     function get_each_context$4(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -88831,7 +86752,7 @@
     	return block;
     }
 
-    function create_fragment$p(ctx) {
+    function create_fragment$q(ctx) {
     	let div;
     	let current;
     	let each_value = /*$notifications*/ ctx[0];
@@ -88855,7 +86776,7 @@
     			}
 
     			attr_dev(div, "class", "absolute top-0 right-0 mr-8");
-    			add_location(div, file$p, 6, 0, 234);
+    			add_location(div, file$q, 6, 0, 234);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -88924,7 +86845,7 @@
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$p.name,
+    		id: create_fragment$q.name,
     		type: "component",
     		source: "",
     		ctx
@@ -88933,7 +86854,7 @@
     	return block;
     }
 
-    function instance$p($$self, $$props, $$invalidate) {
+    function instance$q($$self, $$props, $$invalidate) {
     	let $notifications;
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("NotificationManager", slots, []);
@@ -88960,13 +86881,13 @@
     class NotificationManager extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$p, create_fragment$p, safe_not_equal, {});
+    		init(this, options, instance$q, create_fragment$q, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "NotificationManager",
     			options,
-    			id: create_fragment$p.name
+    			id: create_fragment$q.name
     		});
     	}
     }
@@ -89080,9 +87001,9 @@
     }
 
     /* src/common/components/sidebar/SidebarItem.svelte generated by Svelte v3.37.0 */
-    const file$o = "src/common/components/sidebar/SidebarItem.svelte";
+    const file$p = "src/common/components/sidebar/SidebarItem.svelte";
 
-    function create_fragment$o(ctx) {
+    function create_fragment$p(ctx) {
     	let div;
     	let a;
     	let icon_1;
@@ -89111,9 +87032,9 @@
     			t1 = text(/*name*/ ctx[0]);
     			attr_dev(a, "href", /*link*/ ctx[2]);
     			attr_dev(a, "class", "mx-1 group flex items-center px-4 py-2 text-md font-medium rounded-md");
-    			add_location(a, file$o, 8, 2, 186);
+    			add_location(a, file$p, 8, 2, 186);
     			attr_dev(div, "class", "py-1");
-    			add_location(div, file$o, 7, 0, 165);
+    			add_location(div, file$p, 7, 0, 165);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -89171,7 +87092,7 @@
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$o.name,
+    		id: create_fragment$p.name,
     		type: "component",
     		source: "",
     		ctx
@@ -89180,7 +87101,7 @@
     	return block;
     }
 
-    function instance$o($$self, $$props, $$invalidate) {
+    function instance$p($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("SidebarItem", slots, []);
     	let { name } = $$props;
@@ -89216,13 +87137,13 @@
     class SidebarItem extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$o, create_fragment$o, safe_not_equal, { name: 0, icon: 1, link: 2 });
+    		init(this, options, instance$p, create_fragment$p, safe_not_equal, { name: 0, icon: 1, link: 2 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "SidebarItem",
     			options,
-    			id: create_fragment$o.name
+    			id: create_fragment$p.name
     		});
 
     		const { ctx } = this.$$;
@@ -89267,9 +87188,9 @@
     }
 
     /* src/common/components/sidebar/Sidebar.svelte generated by Svelte v3.37.0 */
-    const file$n = "src/common/components/sidebar/Sidebar.svelte";
+    const file$o = "src/common/components/sidebar/Sidebar.svelte";
 
-    function create_fragment$n(ctx) {
+    function create_fragment$o(ctx) {
     	let div7;
     	let div0;
     	let t0;
@@ -89422,54 +87343,54 @@
     			create_component(sidebaritem5.$$.fragment);
     			attr_dev(div0, "class", "fixed inset-0 bg-gray-900 bg-opacity-75");
     			attr_dev(div0, "aria-hidden", "true");
-    			add_location(div0, file$n, 13, 2, 399);
+    			add_location(div0, file$o, 13, 2, 399);
     			attr_dev(div1, "class", "ml-1 flex items-center justify-center h-10 w-10 rounded-full cursor-pointer");
-    			add_location(div1, file$n, 21, 6, 756);
+    			add_location(div1, file$o, 21, 6, 756);
     			attr_dev(div2, "class", "absolute top-0 right-0 -mr-12 pt-2");
-    			add_location(div2, file$n, 20, 4, 701);
+    			add_location(div2, file$o, 20, 4, 701);
     			attr_dev(img0, "class", "h-8 w-auto");
     			if (img0.src !== (img0_src_value = "https://energify.pt/logo-small.png")) attr_dev(img0, "src", img0_src_value);
     			attr_dev(img0, "alt", "Energify");
-    			add_location(img0, file$n, 30, 6, 1027);
+    			add_location(img0, file$o, 30, 6, 1027);
     			attr_dev(span0, "class", "text-gray-50 ml-2 text-2xl font-medium");
-    			add_location(span0, file$n, 31, 6, 1116);
+    			add_location(span0, file$o, 31, 6, 1116);
     			attr_dev(div3, "class", "flex-shrink-0 flex items-center px-4");
-    			add_location(div3, file$n, 29, 4, 970);
+    			add_location(div3, file$o, 29, 4, 970);
     			attr_dev(nav0, "class", "px-2 space-y-1");
-    			add_location(nav0, file$n, 34, 6, 1252);
+    			add_location(nav0, file$o, 34, 6, 1252);
     			attr_dev(div4, "class", "mt-5 flex-1 h-0 overflow-y-auto");
-    			add_location(div4, file$n, 33, 4, 1200);
+    			add_location(div4, file$o, 33, 4, 1200);
     			attr_dev(div5, "class", "relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-gray-900 transition \n      ease-in-out duration-300 transform");
     			toggle_class(div5, "-translate-x-full", !/*isMenuOpen*/ ctx[1]);
     			toggle_class(div5, "translate-x-0", /*isMenuOpen*/ ctx[1]);
-    			add_location(div5, file$n, 14, 2, 476);
+    			add_location(div5, file$o, 14, 2, 476);
     			attr_dev(div6, "class", "flex-shrink-0 w-14");
     			attr_dev(div6, "aria-hidden", "true");
-    			add_location(div6, file$n, 42, 2, 1520);
+    			add_location(div6, file$o, 42, 2, 1520);
     			attr_dev(div7, "class", "fixed inset-0 flex z-40 md:hidden transition-opacity ease-linear duration-300");
     			toggle_class(div7, "opacity-0", !/*isMenuOpen*/ ctx[1]);
     			toggle_class(div7, "opacity-100", /*isMenuOpen*/ ctx[1]);
-    			add_location(div7, file$n, 8, 0, 237);
+    			add_location(div7, file$o, 8, 0, 237);
     			attr_dev(img1, "class", "h-8 w-auto");
     			if (img1.src !== (img1_src_value = "https://energify.pt/logo-small.png")) attr_dev(img1, "src", img1_src_value);
     			attr_dev(img1, "alt", "Energify");
-    			add_location(img1, file$n, 49, 8, 1818);
+    			add_location(img1, file$o, 49, 8, 1818);
     			attr_dev(span1, "class", "text-gray-50 ml-2 text-2xl font-medium");
-    			add_location(span1, file$n, 50, 8, 1909);
+    			add_location(span1, file$o, 50, 8, 1909);
     			attr_dev(div8, "class", "flex items-center h-16 flex-shrink-0 px-7 pt-8 bg-gray-900");
-    			add_location(div8, file$n, 48, 6, 1737);
+    			add_location(div8, file$o, 48, 6, 1737);
     			attr_dev(span2, "class", "uppercase text-sm text-gray-500 font-medium px-4");
-    			add_location(span2, file$n, 54, 10, 2120);
+    			add_location(span2, file$o, 54, 10, 2120);
     			attr_dev(nav1, "class", "flex-1 px-2 py-12 bg-gray-900 space-y-1");
-    			add_location(nav1, file$n, 53, 8, 2056);
+    			add_location(nav1, file$o, 53, 8, 2056);
     			attr_dev(div9, "class", "flex-1 flex flex-col overflow-y-auto");
-    			add_location(div9, file$n, 52, 6, 1997);
+    			add_location(div9, file$o, 52, 6, 1997);
     			attr_dev(div10, "class", "flex flex-col h-0 flex-1");
-    			add_location(div10, file$n, 47, 4, 1692);
+    			add_location(div10, file$o, 47, 4, 1692);
     			attr_dev(div11, "class", "flex flex-col w-64");
-    			add_location(div11, file$n, 46, 2, 1655);
+    			add_location(div11, file$o, 46, 2, 1655);
     			attr_dev(div12, "class", "hidden md:flex md:flex-shrink-0 border-r border-gray-200");
-    			add_location(div12, file$n, 45, 0, 1582);
+    			add_location(div12, file$o, 45, 0, 1582);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -89578,7 +87499,7 @@
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$n.name,
+    		id: create_fragment$o.name,
     		type: "component",
     		source: "",
     		ctx
@@ -89587,7 +87508,7 @@
     	return block;
     }
 
-    function instance$n($$self, $$props, $$invalidate) {
+    function instance$o($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("Sidebar", slots, []);
     	let isMenuOpen = false;
@@ -89627,13 +87548,13 @@
     class Sidebar extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$n, create_fragment$n, safe_not_equal, { handleMenuToggle: 0 });
+    		init(this, options, instance$o, create_fragment$o, safe_not_equal, { handleMenuToggle: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Sidebar",
     			options,
-    			id: create_fragment$n.name
+    			id: create_fragment$o.name
     		});
     	}
 
@@ -89647,7 +87568,7 @@
     }
 
     /* src/common/components/dropdown/Dropdown.svelte generated by Svelte v3.37.0 */
-    const file$m = "src/common/components/dropdown/Dropdown.svelte";
+    const file$n = "src/common/components/dropdown/Dropdown.svelte";
 
     // (22:6) {#if name}
     function create_if_block$3(ctx) {
@@ -89679,7 +87600,7 @@
     	return block;
     }
 
-    function create_fragment$m(ctx) {
+    function create_fragment$n(ctx) {
     	let div3;
     	let div0;
     	let button;
@@ -89719,12 +87640,12 @@
     			div1 = element("div");
     			if (default_slot) default_slot.c();
     			attr_dev(button, "class", button_class_value = "inline-flex justify-center w-full " + /*buttonClass*/ ctx[1]);
-    			add_location(button, file$m, 20, 4, 513);
-    			add_location(div0, file$m, 19, 2, 503);
+    			add_location(button, file$n, 20, 4, 513);
+    			add_location(div0, file$n, 19, 2, 503);
     			attr_dev(div1, "class", "py-1");
     			attr_dev(div1, "role", "none");
-    			add_location(div1, file$m, 39, 4, 1155);
-    			attr_dev(div2, "class", div2_class_value = "transition ease-out duration-100 origin-top-right absolute right-0 mt-2 w-" + /*width*/ ctx[2] + " z-30\n     rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none");
+    			add_location(div1, file$n, 39, 4, 1155);
+    			attr_dev(div2, "class", div2_class_value = "transition ease-out duration-100 origin-top-right absolute right-0 mt-2 w-" + /*width*/ ctx[2] + "\n     rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30");
     			attr_dev(div2, "role", "menu");
     			attr_dev(div2, "aria-orientation", "vertical");
     			attr_dev(div2, "aria-labelledby", "menu-button");
@@ -89732,9 +87653,9 @@
     			toggle_class(div2, "opacity-0", !/*isMenuOpen*/ ctx[3]);
     			toggle_class(div2, "opacity-100", /*isMenuOpen*/ ctx[3]);
     			toggle_class(div2, "hidden", !/*isMenuRendered*/ ctx[4]);
-    			add_location(div2, file$m, 28, 2, 752);
+    			add_location(div2, file$n, 28, 2, 752);
     			attr_dev(div3, "class", "relative inline-block text-left");
-    			add_location(div3, file$m, 18, 0, 455);
+    			add_location(div3, file$n, 18, 0, 455);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -89789,7 +87710,7 @@
     				}
     			}
 
-    			if (!current || dirty & /*width*/ 4 && div2_class_value !== (div2_class_value = "transition ease-out duration-100 origin-top-right absolute right-0 mt-2 w-" + /*width*/ ctx[2] + " z-30\n     rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none")) {
+    			if (!current || dirty & /*width*/ 4 && div2_class_value !== (div2_class_value = "transition ease-out duration-100 origin-top-right absolute right-0 mt-2 w-" + /*width*/ ctx[2] + "\n     rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30")) {
     				attr_dev(div2, "class", div2_class_value);
     			}
 
@@ -89828,7 +87749,7 @@
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$m.name,
+    		id: create_fragment$n.name,
     		type: "component",
     		source: "",
     		ctx
@@ -89837,7 +87758,7 @@
     	return block;
     }
 
-    function instance$m($$self, $$props, $$invalidate) {
+    function instance$n($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("Dropdown", slots, ['default']);
     	let { name } = $$props;
@@ -89907,13 +87828,13 @@
     class Dropdown extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$m, create_fragment$m, safe_not_equal, { name: 0, buttonClass: 1, width: 2 });
+    		init(this, options, instance$n, create_fragment$n, safe_not_equal, { name: 0, buttonClass: 1, width: 2 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Dropdown",
     			options,
-    			id: create_fragment$m.name
+    			id: create_fragment$n.name
     		});
 
     		const { ctx } = this.$$;
@@ -89954,7 +87875,7 @@
     }
 
     /* src/common/components/shell/ShellUser.svelte generated by Svelte v3.37.0 */
-    const file$l = "src/common/components/shell/ShellUser.svelte";
+    const file$m = "src/common/components/shell/ShellUser.svelte";
 
     function get_then_context$3(ctx) {
     	ctx[3] = ctx[4].hbars;
@@ -90051,9 +87972,9 @@
     			div1 = element("div");
     			div1.textContent = "Logout";
     			attr_dev(div0, "class", "hover:bg-gray-100 hover:text-gray-900 text-gray-800 block px-4 py-2 text-sm\n      cursor-pointer");
-    			add_location(div0, file$l, 22, 4, 663);
+    			add_location(div0, file$m, 22, 4, 663);
     			attr_dev(div1, "class", "hover:bg-gray-100 hover:text-gray-900 text-gray-800 block px-4 \n    py-2 text-sm cursor-pointer");
-    			add_location(div1, file$l, 28, 4, 815);
+    			add_location(div1, file$m, 28, 4, 815);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div0, anchor);
@@ -90086,7 +88007,7 @@
     	return block;
     }
 
-    function create_fragment$l(ctx) {
+    function create_fragment$m(ctx) {
     	let div1;
     	let img;
     	let img_src_value;
@@ -90138,15 +88059,15 @@
     			attr_dev(img, "alt", "Profile");
     			if (img.src !== (img_src_value = "https://uifaces.co/our-content/donated/gPZwCbdS.jpg")) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "class", "w-10 h-10 rounded-full  hidden md:flex");
-    			add_location(img, file$l, 6, 2, 224);
+    			add_location(img, file$m, 6, 2, 224);
     			attr_dev(span0, "class", "text-base text-gray-900");
-    			add_location(span0, file$l, 12, 4, 404);
+    			add_location(span0, file$m, 12, 4, 404);
     			attr_dev(span1, "class", "text-sm text-gray-500");
-    			add_location(span1, file$l, 13, 4, 466);
+    			add_location(span1, file$m, 13, 4, 466);
     			attr_dev(div0, "class", "flex flex-col mx-2");
-    			add_location(div0, file$l, 11, 2, 367);
+    			add_location(div0, file$m, 11, 2, 367);
     			attr_dev(div1, "class", "flex items-center");
-    			add_location(div1, file$l, 5, 0, 190);
+    			add_location(div1, file$m, 5, 0, 190);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -90205,7 +88126,7 @@
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$l.name,
+    		id: create_fragment$m.name,
     		type: "component",
     		source: "",
     		ctx
@@ -90214,7 +88135,7 @@
     	return block;
     }
 
-    function instance$l($$self, $$props, $$invalidate) {
+    function instance$m($$self, $$props, $$invalidate) {
     	let $user;
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots("ShellUser", slots, []);
@@ -90243,39 +88164,30 @@
     class ShellUser extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$l, create_fragment$l, safe_not_equal, {});
+    		init(this, options, instance$m, create_fragment$m, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "ShellUser",
     			options,
-    			id: create_fragment$l.name
+    			id: create_fragment$m.name
     		});
     	}
     }
 
-    /* src/common/components/shell/Shell.svelte generated by Svelte v3.37.0 */
-    const file$k = "src/common/components/shell/Shell.svelte";
+    /* src/common/components/topbar/Topbar.svelte generated by Svelte v3.37.0 */
+    const file$l = "src/common/components/topbar/Topbar.svelte";
 
-    function create_fragment$k(ctx) {
-    	let div3;
-    	let sidebar_1;
-    	let t0;
-    	let main;
+    function create_fragment$l(ctx) {
     	let div1;
     	let div0;
     	let icon;
-    	let t1;
+    	let t0;
     	let h1;
+    	let t1;
     	let t2;
-    	let t3;
     	let shelluser;
-    	let t4;
-    	let div2;
     	let current;
-    	let sidebar_1_props = {};
-    	sidebar_1 = new Sidebar({ props: sidebar_1_props, $$inline: true });
-    	/*sidebar_1_binding*/ ctx[4](sidebar_1);
 
     	icon = new Icon({
     			props: {
@@ -90285,62 +88197,204 @@
     			$$inline: true
     		});
 
-    	icon.$on("click", /*click_handler*/ ctx[5]);
+    	icon.$on("click", /*click_handler*/ ctx[2]);
     	shelluser = new ShellUser({ $$inline: true });
-    	const default_slot_template = /*#slots*/ ctx[3].default;
-    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[2], null);
 
     	const block = {
     		c: function create() {
-    			div3 = element("div");
-    			create_component(sidebar_1.$$.fragment);
-    			t0 = space();
-    			main = element("main");
     			div1 = element("div");
     			div0 = element("div");
     			create_component(icon.$$.fragment);
-    			t1 = space();
+    			t0 = space();
     			h1 = element("h1");
-    			t2 = text(/*title*/ ctx[0]);
-    			t3 = space();
+    			t1 = text(/*title*/ ctx[0]);
+    			t2 = space();
     			create_component(shelluser.$$.fragment);
-    			t4 = space();
-    			div2 = element("div");
-    			if (default_slot) default_slot.c();
     			attr_dev(h1, "class", "text-3xl font-semibold text-gray-900");
-    			add_location(h1, file$k, 20, 8, 676);
+    			add_location(h1, file$l, 17, 4, 466);
     			attr_dev(div0, "class", "flex items-center");
-    			add_location(div0, file$k, 14, 6, 466);
-    			attr_dev(div1, "class", "flex border-b overflow-hidden border-gray-200 justify-between items-center \n      bg-white mx-auto px-8 py-5");
-    			add_location(div1, file$k, 10, 4, 326);
-    			attr_dev(div2, "class", "h-full mx-auto px-4 sm:px-6 md:px-8 py-6 overflow-y-auto");
-    			add_location(div2, file$k, 25, 4, 787);
-    			attr_dev(main, "class", "flex-1 focus:outline-none");
-    			add_location(main, file$k, 9, 2, 281);
-    			attr_dev(div3, "class", "flex h-screen overflow-hidden");
-    			add_location(div3, file$k, 7, 0, 201);
+    			add_location(div0, file$l, 11, 2, 280);
+    			attr_dev(div1, "class", "flex border-b border-gray-200 justify-between items-center \n      bg-white mx-auto px-8 py-5");
+    			add_location(div1, file$l, 7, 0, 168);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, div3, anchor);
-    			mount_component(sidebar_1, div3, null);
-    			append_dev(div3, t0);
-    			append_dev(div3, main);
-    			append_dev(main, div1);
+    			insert_dev(target, div1, anchor);
     			append_dev(div1, div0);
     			mount_component(icon, div0, null);
-    			append_dev(div0, t1);
+    			append_dev(div0, t0);
     			append_dev(div0, h1);
-    			append_dev(h1, t2);
-    			append_dev(div1, t3);
+    			append_dev(h1, t1);
+    			append_dev(div1, t2);
     			mount_component(shelluser, div1, null);
-    			append_dev(main, t4);
-    			append_dev(main, div2);
+    			current = true;
+    		},
+    		p: function update(ctx, [dirty]) {
+    			if (!current || dirty & /*title*/ 1) set_data_dev(t1, /*title*/ ctx[0]);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(icon.$$.fragment, local);
+    			transition_in(shelluser.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(icon.$$.fragment, local);
+    			transition_out(shelluser.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div1);
+    			destroy_component(icon);
+    			destroy_component(shelluser);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$l.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$l($$self, $$props, $$invalidate) {
+    	let { $$slots: slots = {}, $$scope } = $$props;
+    	validate_slots("Topbar", slots, []);
+    	
+    	let { title } = $$props;
+    	let { sidebar } = $$props;
+    	const writable_props = ["title", "sidebar"];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<Topbar> was created with unknown prop '${key}'`);
+    	});
+
+    	const click_handler = () => sidebar.handleMenuToggle();
+
+    	$$self.$$set = $$props => {
+    		if ("title" in $$props) $$invalidate(0, title = $$props.title);
+    		if ("sidebar" in $$props) $$invalidate(1, sidebar = $$props.sidebar);
+    	};
+
+    	$$self.$capture_state = () => ({ Icon, Menu, ShellUser, title, sidebar });
+
+    	$$self.$inject_state = $$props => {
+    		if ("title" in $$props) $$invalidate(0, title = $$props.title);
+    		if ("sidebar" in $$props) $$invalidate(1, sidebar = $$props.sidebar);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [title, sidebar, click_handler];
+    }
+
+    class Topbar extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+    		init(this, options, instance$l, create_fragment$l, safe_not_equal, { title: 0, sidebar: 1 });
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "Topbar",
+    			options,
+    			id: create_fragment$l.name
+    		});
+
+    		const { ctx } = this.$$;
+    		const props = options.props || {};
+
+    		if (/*title*/ ctx[0] === undefined && !("title" in props)) {
+    			console.warn("<Topbar> was created without expected prop 'title'");
+    		}
+
+    		if (/*sidebar*/ ctx[1] === undefined && !("sidebar" in props)) {
+    			console.warn("<Topbar> was created without expected prop 'sidebar'");
+    		}
+    	}
+
+    	get title() {
+    		throw new Error("<Topbar>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set title(value) {
+    		throw new Error("<Topbar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get sidebar() {
+    		throw new Error("<Topbar>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set sidebar(value) {
+    		throw new Error("<Topbar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    /* src/common/components/shell/Shell.svelte generated by Svelte v3.37.0 */
+    const file$k = "src/common/components/shell/Shell.svelte";
+
+    function create_fragment$k(ctx) {
+    	let div1;
+    	let sidebar_1;
+    	let t0;
+    	let main;
+    	let topbar;
+    	let t1;
+    	let div0;
+    	let current;
+    	let sidebar_1_props = {};
+    	sidebar_1 = new Sidebar({ props: sidebar_1_props, $$inline: true });
+    	/*sidebar_1_binding*/ ctx[4](sidebar_1);
+
+    	topbar = new Topbar({
+    			props: {
+    				sidebar: /*sidebar*/ ctx[1],
+    				title: /*title*/ ctx[0]
+    			},
+    			$$inline: true
+    		});
+
+    	const default_slot_template = /*#slots*/ ctx[3].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[2], null);
+
+    	const block = {
+    		c: function create() {
+    			div1 = element("div");
+    			create_component(sidebar_1.$$.fragment);
+    			t0 = space();
+    			main = element("main");
+    			create_component(topbar.$$.fragment);
+    			t1 = space();
+    			div0 = element("div");
+    			if (default_slot) default_slot.c();
+    			attr_dev(div0, "class", "h-full mx-auto px-4 sm:px-6 md:px-8 py-6 overflow-y-auto");
+    			add_location(div0, file$k, 10, 4, 313);
+    			attr_dev(main, "class", "flex-1 focus:outline-none");
+    			add_location(main, file$k, 8, 2, 235);
+    			attr_dev(div1, "class", "flex h-screen overflow-hidden");
+    			add_location(div1, file$k, 6, 0, 155);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, div1, anchor);
+    			mount_component(sidebar_1, div1, null);
+    			append_dev(div1, t0);
+    			append_dev(div1, main);
+    			mount_component(topbar, main, null);
+    			append_dev(main, t1);
+    			append_dev(main, div0);
 
     			if (default_slot) {
-    				default_slot.m(div2, null);
+    				default_slot.m(div0, null);
     			}
 
     			current = true;
@@ -90348,7 +88402,10 @@
     		p: function update(ctx, [dirty]) {
     			const sidebar_1_changes = {};
     			sidebar_1.$set(sidebar_1_changes);
-    			if (!current || dirty & /*title*/ 1) set_data_dev(t2, /*title*/ ctx[0]);
+    			const topbar_changes = {};
+    			if (dirty & /*sidebar*/ 2) topbar_changes.sidebar = /*sidebar*/ ctx[1];
+    			if (dirty & /*title*/ 1) topbar_changes.title = /*title*/ ctx[0];
+    			topbar.$set(topbar_changes);
 
     			if (default_slot) {
     				if (default_slot.p && dirty & /*$$scope*/ 4) {
@@ -90359,24 +88416,21 @@
     		i: function intro(local) {
     			if (current) return;
     			transition_in(sidebar_1.$$.fragment, local);
-    			transition_in(icon.$$.fragment, local);
-    			transition_in(shelluser.$$.fragment, local);
+    			transition_in(topbar.$$.fragment, local);
     			transition_in(default_slot, local);
     			current = true;
     		},
     		o: function outro(local) {
     			transition_out(sidebar_1.$$.fragment, local);
-    			transition_out(icon.$$.fragment, local);
-    			transition_out(shelluser.$$.fragment, local);
+    			transition_out(topbar.$$.fragment, local);
     			transition_out(default_slot, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div3);
+    			if (detaching) detach_dev(div1);
     			/*sidebar_1_binding*/ ctx[4](null);
     			destroy_component(sidebar_1);
-    			destroy_component(icon);
-    			destroy_component(shelluser);
+    			destroy_component(topbar);
     			if (default_slot) default_slot.d(detaching);
     		}
     	};
@@ -90410,21 +88464,12 @@
     		});
     	}
 
-    	const click_handler = () => sidebar.handleMenuToggle();
-
     	$$self.$$set = $$props => {
     		if ("title" in $$props) $$invalidate(0, title = $$props.title);
     		if ("$$scope" in $$props) $$invalidate(2, $$scope = $$props.$$scope);
     	};
 
-    	$$self.$capture_state = () => ({
-    		Icon,
-    		Menu,
-    		Sidebar,
-    		ShellUser,
-    		title,
-    		sidebar
-    	});
+    	$$self.$capture_state = () => ({ Sidebar, Topbar, title, sidebar });
 
     	$$self.$inject_state = $$props => {
     		if ("title" in $$props) $$invalidate(0, title = $$props.title);
@@ -90435,7 +88480,7 @@
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [title, sidebar, $$scope, slots, sidebar_1_binding, click_handler];
+    	return [title, sidebar, $$scope, slots, sidebar_1_binding];
     }
 
     class Shell extends SvelteComponentDev {
@@ -90950,19 +88995,19 @@
     			option0.__value = "1h";
     			option0.value = option0.__value;
     			attr_dev(option0, "default", "");
-    			add_location(option0, file$h, 5, 2, 146);
+    			add_location(option0, file$h, 5, 2, 148);
     			option1.__value = "1d";
     			option1.value = option1.__value;
-    			add_location(option1, file$h, 6, 2, 187);
+    			add_location(option1, file$h, 6, 2, 189);
     			option2.__value = "1w";
     			option2.value = option2.__value;
-    			add_location(option2, file$h, 7, 2, 220);
+    			add_location(option2, file$h, 7, 2, 222);
     			option3.__value = "1m";
     			option3.value = option3.__value;
-    			add_location(option3, file$h, 8, 2, 253);
+    			add_location(option3, file$h, 8, 2, 255);
     			option4.__value = "1y";
     			option4.value = option4.__value;
-    			add_location(option4, file$h, 9, 2, 286);
+    			add_location(option4, file$h, 9, 2, 288);
     			attr_dev(select, "class", "input");
     			if (/*interval*/ ctx[1] === void 0) add_render_callback(() => /*select_change_handler*/ ctx[2].call(select));
     			add_location(select, file$h, 4, 0, 64);
@@ -90982,7 +89027,7 @@
     			if (!mounted) {
     				dispose = [
     					listen_dev(select, "change", /*select_change_handler*/ ctx[2]),
-    					listen_dev(select, "blur", /*blur_handler*/ ctx[3], false, false, false)
+    					listen_dev(select, "change", /*change_handler*/ ctx[3], false, false, false)
     				];
 
     				mounted = true;
@@ -91029,7 +89074,7 @@
     		$$invalidate(1, interval);
     	}
 
-    	const blur_handler = () => onChange(interval);
+    	const change_handler = () => onChange(interval);
 
     	$$self.$$set = $$props => {
     		if ("onChange" in $$props) $$invalidate(0, onChange = $$props.onChange);
@@ -91046,7 +89091,7 @@
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [onChange, interval, select_change_handler, blur_handler];
+    	return [onChange, interval, select_change_handler, change_handler];
     }
 
     class IntervalSelector extends SvelteComponentDev {
@@ -91113,10 +89158,31 @@
         }
     }
 
+    const energyHistoryOptions = {
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true },
+        },
+        scales: {
+            x: {
+                grid: { display: false, borderColor: "#F3F4F6" },
+                ticks: { font: { size: 14, family: "Inter" }, color: "rgb(156, 163, 175)" },
+            },
+            y: {
+                beginAtZero: true,
+                grid: { drawBorder: false, color: "#F3F4F6" },
+                ticks: { font: { size: 14, family: "Inter" }, color: "rgb(156, 163, 175)" },
+            },
+        },
+    };
+
     /* src/dashboard/components/EnergyHistoryChart.svelte generated by Svelte v3.37.0 */
+
+    const { console: console_1 } = globals;
     const file$g = "src/dashboard/components/EnergyHistoryChart.svelte";
 
-    // (61:0) <Card title="Energy History">
+    // (45:0) <Card title="Energy History">
     function create_default_slot$b(ctx) {
     	let canvas;
 
@@ -91125,7 +89191,7 @@
     			canvas = element("canvas");
     			attr_dev(canvas, "id", "energyChart");
     			attr_dev(canvas, "class", "w-full");
-    			add_location(canvas, file$g, 64, 2, 2558);
+    			add_location(canvas, file$g, 48, 2, 2096);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, canvas, anchor);
@@ -91139,14 +89205,14 @@
     		block,
     		id: create_default_slot$b.name,
     		type: "slot",
-    		source: "(61:0) <Card title=\\\"Energy History\\\">",
+    		source: "(45:0) <Card title=\\\"Energy History\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (62:2) 
+    // (46:2) 
     function create_action_slot$2(ctx) {
     	let span;
     	let intervalselector;
@@ -91162,7 +89228,7 @@
     			span = element("span");
     			create_component(intervalselector.$$.fragment);
     			attr_dev(span, "slot", "action");
-    			add_location(span, file$g, 61, 2, 2453);
+    			add_location(span, file$g, 45, 2, 1991);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -91189,7 +89255,7 @@
     		block,
     		id: create_action_slot$2.name,
     		type: "slot",
-    		source: "(62:2) ",
+    		source: "(46:2) ",
     		ctx
     	});
 
@@ -91226,7 +89292,7 @@
     		p: function update(ctx, [dirty]) {
     			const card_changes = {};
 
-    			if (dirty & /*$$scope*/ 128) {
+    			if (dirty & /*$$scope*/ 64) {
     				card_changes.$$scope = { dirty, ctx };
     			}
 
@@ -91309,43 +89375,19 @@
     		}
     	];
 
-    	let options = {
-    		responsive: true,
-    		plugins: {
-    			legend: { display: false },
-    			tooltip: { enabled: true }
-    		},
-    		scales: {
-    			x: {
-    				grid: { display: false, borderColor: "#F3F4F6" },
-    				ticks: {
-    					font: { size: 14, family: "Inter" },
-    					color: "rgb(156, 163, 175)"
-    				}
-    			},
-    			y: {
-    				beginAtZero: true,
-    				grid: { drawBorder: false, color: "#F3F4F6" },
-    				ticks: {
-    					font: { size: 14, family: "Inter" },
-    					color: "rgb(156, 163, 175)"
-    				}
-    			}
-    		}
-    	};
-
     	const nowDateRounded = new Date();
     	nowDateRounded.setMinutes(0);
 
-    	onMount(() => __awaiter(void 0, void 0, void 0, function* () {
+    	onMount(() => {
     		const canvas = document.getElementById("energyChart");
-    		chart = createChart(canvas.getContext("2d"), "line", dataset, [], options);
+    		chart = createChart(canvas.getContext("2d"), "line", dataset, [], energyHistoryOptions);
     		updateChart();
-    	}));
+    	});
 
     	function updateChart(interval = "1h") {
     		return __awaiter(this, void 0, void 0, function* () {
     			const { data } = yield transactionsService.fetchEnergyHistory(interval, 12);
+    			console.log(data);
     			chart.data.datasets[0].data = data;
     			chart.data.labels = intervalToChartLabel(interval, 12);
     			chart.update();
@@ -91355,7 +89397,7 @@
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<EnergyHistoryChart> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console_1.warn(`<EnergyHistoryChart> was created with unknown prop '${key}'`);
     	});
 
     	const func = interval => updateChart(interval);
@@ -91368,9 +89410,9 @@
     		IntervalSelector,
     		intervalToChartLabel,
     		transactionsService,
+    		energyHistoryOptions,
     		chart,
     		dataset,
-    		options,
     		nowDateRounded,
     		updateChart
     	});
@@ -91379,7 +89421,6 @@
     		if ("__awaiter" in $$props) __awaiter = $$props.__awaiter;
     		if ("chart" in $$props) chart = $$props.chart;
     		if ("dataset" in $$props) dataset = $$props.dataset;
-    		if ("options" in $$props) options = $$props.options;
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -91403,14 +89444,30 @@
     	}
     }
 
-    /* src/dashboard/components/EnergyFlowChart.svelte generated by Svelte v3.37.0 */
+    const energyFlowOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true },
+        },
+        scales: {
+            x: {
+                grid: { display: false, drawBorder: false },
+                ticks: { display: false, font: { size: 14, family: "Inter" }, color: "rgb(156, 163, 175)" },
+            },
+            y: {
+                grid: { display: false, drawBorder: false, color: "#F3F4F6" },
+                ticks: { display: false, font: { size: 14, family: "Inter" }, color: "rgb(156, 163, 175)" },
+            },
+        },
+    };
 
-    const { console: console_1 } = globals;
+    /* src/dashboard/components/EnergyFlowChart.svelte generated by Svelte v3.37.0 */
     const file$f = "src/dashboard/components/EnergyFlowChart.svelte";
 
-    // (65:0) <Card title="Energy Flow">
+    // (44:0) <Card title="Energy Flow">
     function create_default_slot$a(ctx) {
-    	let div10;
     	let div4;
     	let div1;
     	let div0;
@@ -91437,7 +89494,6 @@
 
     	const block = {
     		c: function create() {
-    			div10 = element("div");
     			div4 = element("div");
     			div1 = element("div");
     			div0 = element("div");
@@ -91465,44 +89521,41 @@
     			t9 = space();
     			span3 = element("span");
     			span3.textContent = "Public Grid";
-    			attr_dev(canvas0, "id", "energyFlowIn");
+    			attr_dev(canvas0, "id", "chartIn");
     			attr_dev(canvas0, "class", "w-64");
-    			add_location(canvas0, file$f, 75, 10, 3666);
-    			add_location(div0, file$f, 74, 8, 3650);
+    			add_location(canvas0, file$f, 54, 8, 2687);
+    			add_location(div0, file$f, 53, 6, 2673);
     			attr_dev(span0, "class", "text-gray-900 font-medium");
-    			add_location(span0, file$f, 77, 8, 3731);
-    			attr_dev(div1, "class", "flex flex-col justify-around items-center mx-8");
-    			add_location(div1, file$f, 73, 6, 3581);
-    			attr_dev(canvas1, "id", "energyFlowOut");
+    			add_location(span0, file$f, 56, 6, 2743);
+    			attr_dev(div1, "class", "flex flex-col items-center mx-8");
+    			add_location(div1, file$f, 52, 4, 2621);
+    			attr_dev(canvas1, "id", "chartOut");
     			attr_dev(canvas1, "class", "w-64");
-    			add_location(canvas1, file$f, 81, 10, 3879);
-    			add_location(div2, file$f, 80, 8, 3863);
+    			add_location(canvas1, file$f, 60, 8, 2883);
+    			add_location(div2, file$f, 59, 6, 2869);
     			attr_dev(span1, "class", "text-gray-900 font-medium");
-    			add_location(span1, file$f, 83, 8, 3945);
+    			add_location(span1, file$f, 62, 6, 2940);
     			attr_dev(div3, "class", "flex flex-col items-center mx-8");
-    			add_location(div3, file$f, 79, 6, 3809);
-    			attr_dev(div4, "class", "flex justify-between items-center mb-12");
-    			add_location(div4, file$f, 72, 4, 3521);
+    			add_location(div3, file$f, 58, 4, 2817);
+    			attr_dev(div4, "class", "flex items-center mb-8");
+    			add_location(div4, file$f, 51, 2, 2580);
     			attr_dev(div5, "class", "w-4 h-4 rounded-sm bg-green-500");
-    			add_location(div5, file$f, 88, 8, 4129);
+    			add_location(div5, file$f, 67, 6, 3114);
     			attr_dev(span2, "class", "text-gray-500 font-medium ml-1");
-    			add_location(span2, file$f, 89, 8, 4185);
-    			attr_dev(div6, "class", "flex items-center mx-4");
-    			add_location(div6, file$f, 87, 6, 4084);
+    			add_location(span2, file$f, 68, 6, 3168);
+    			attr_dev(div6, "class", "flex items-center ml-5");
+    			add_location(div6, file$f, 66, 4, 3071);
     			attr_dev(div7, "class", "w-4 h-4 rounded-sm bg-red-400");
-    			add_location(div7, file$f, 92, 8, 4311);
+    			add_location(div7, file$f, 71, 6, 3288);
     			attr_dev(span3, "class", "text-gray-500 font-medium ml-1");
-    			add_location(span3, file$f, 93, 8, 4365);
-    			attr_dev(div8, "class", "flex items-center mx-4");
-    			add_location(div8, file$f, 91, 6, 4266);
+    			add_location(span3, file$f, 72, 6, 3340);
+    			attr_dev(div8, "class", "flex items-center ml-4");
+    			add_location(div8, file$f, 70, 4, 3245);
     			attr_dev(div9, "class", "flex items-center justify-center");
-    			add_location(div9, file$f, 86, 4, 4031);
-    			attr_dev(div10, "class", "flex flex-col items-center justify-center");
-    			add_location(div10, file$f, 71, 2, 3461);
+    			add_location(div9, file$f, 65, 2, 3020);
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, div10, anchor);
-    			append_dev(div10, div4);
+    			insert_dev(target, div4, anchor);
     			append_dev(div4, div1);
     			append_dev(div1, div0);
     			append_dev(div0, canvas0);
@@ -91514,8 +89567,8 @@
     			append_dev(div2, canvas1);
     			append_dev(div3, t3);
     			append_dev(div3, span1);
-    			append_dev(div10, t5);
-    			append_dev(div10, div9);
+    			insert_dev(target, t5, anchor);
+    			insert_dev(target, div9, anchor);
     			append_dev(div9, div6);
     			append_dev(div6, div5);
     			append_dev(div6, t6);
@@ -91527,7 +89580,9 @@
     			append_dev(div8, span3);
     		},
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div10);
+    			if (detaching) detach_dev(div4);
+    			if (detaching) detach_dev(t5);
+    			if (detaching) detach_dev(div9);
     		}
     	};
 
@@ -91535,14 +89590,14 @@
     		block,
     		id: create_default_slot$a.name,
     		type: "slot",
-    		source: "(65:0) <Card title=\\\"Energy Flow\\\">",
+    		source: "(44:0) <Card title=\\\"Energy Flow\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (66:2) 
+    // (45:2) 
     function create_action_slot$1(ctx) {
     	let span;
     	let div;
@@ -91561,14 +89616,14 @@
     			input1 = element("input");
     			attr_dev(input0, "type", "date");
     			attr_dev(input0, "class", "input-sm mr-2");
-    			add_location(input0, file$f, 67, 6, 3257);
+    			add_location(input0, file$f, 46, 6, 2375);
     			attr_dev(input1, "type", "date");
     			attr_dev(input1, "class", "input-sm");
-    			add_location(input1, file$f, 68, 6, 3354);
+    			add_location(input1, file$f, 47, 6, 2472);
     			attr_dev(div, "class", "flex");
-    			add_location(div, file$f, 66, 4, 3232);
+    			add_location(div, file$f, 45, 4, 2350);
     			attr_dev(span, "slot", "action");
-    			add_location(span, file$f, 65, 2, 3207);
+    			add_location(span, file$f, 44, 2, 2325);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -91610,7 +89665,7 @@
     		block,
     		id: create_action_slot$1.name,
     		type: "slot",
-    		source: "(66:2) ",
+    		source: "(45:2) ",
     		ctx
     	});
 
@@ -91647,7 +89702,7 @@
     		p: function update(ctx, [dirty]) {
     			const card_changes = {};
 
-    			if (dirty & /*$$scope, endDate, startDate*/ 4099) {
+    			if (dirty & /*$$scope, endDate, startDate*/ 1027) {
     				card_changes.$$scope = { dirty, ctx };
     			}
 
@@ -91721,63 +89776,25 @@
     	
     	let startDate;
     	let endDate;
-    	let energyFlowInChart;
-    	let energyFlowOutChart;
+    	let chartIn;
+    	let chartOut;
 
-    	let energyFlowInDataset = [
+    	let dataset = [
     		{
     			data: [3, 1],
-    			backgroundColor: ["#12B981", "#f87171"]
+    			backgroundColor: ["#12B981", "#101827"]
     		}
     	];
-
-    	let energyFlowOutDataset = [
-    		{
-    			data: [3, 1],
-    			backgroundColor: ["#12B981", "#f87171"]
-    		}
-    	];
-
-    	let options = {
-    		responsive: true,
-    		maintainAspectRatio: false,
-    		plugins: {
-    			legend: { display: false },
-    			tooltip: { enabled: true }
-    		},
-    		scales: {
-    			x: {
-    				grid: { display: false, drawBorder: false },
-    				ticks: {
-    					display: false,
-    					font: { size: 14, family: "Inter" },
-    					color: "rgb(156, 163, 175)"
-    				}
-    			},
-    			y: {
-    				grid: {
-    					display: false,
-    					drawBorder: false,
-    					color: "#F3F4F6"
-    				},
-    				ticks: {
-    					display: false,
-    					font: { size: 14, family: "Inter" },
-    					color: "rgb(156, 163, 175)"
-    				}
-    			}
-    		}
-    	};
 
     	let labels = ["Community", "Public Grid"];
 
-    	onMount(() => __awaiter(void 0, void 0, void 0, function* () {
-    		const energyFlowInCanvas = document.getElementById("energyFlowIn");
-    		energyFlowInChart = createChart(energyFlowInCanvas.getContext("2d"), "pie", energyFlowInDataset, labels, options);
-    		const energyFlowOutCanvas = document.getElementById("energyFlowOut");
-    		energyFlowOutChart = createChart(energyFlowOutCanvas.getContext("2d"), "pie", energyFlowOutDataset, labels, options);
+    	onMount(() => {
+    		const canvasIn = document.getElementById("chartIn");
+    		const canvasOut = document.getElementById("chartOut");
+    		chartIn = createChart(canvasIn.getContext("2d"), "pie", dataset, labels, energyFlowOptions);
+    		chartOut = createChart(canvasOut.getContext("2d"), "pie", dataset, labels, energyFlowOptions);
     		updateChart();
-    	}));
+    	});
 
     	function updateChart() {
     		return __awaiter(this, void 0, void 0, function* () {
@@ -91789,22 +89806,19 @@
     				? endDate
     				: subDays(start, 1));
 
-    			console.log(start, end);
-    			const { data } = yield transactionsService.fetchEnergyFlow(start, end);
-    			const { energyFromCommunity, energyFromPublicGrid, energyToCommunity, energyToPublicGrid } = data;
-    			energyFlowOutChart.data.datasets[0].data = [energyToCommunity, energyToPublicGrid];
-    			energyFlowInChart.data.datasets[0].data = [energyFromCommunity, energyFromPublicGrid];
-    			energyFlowOutChart.update();
-    			energyFlowInChart.update();
-    			energyFlowOutChart.resize();
-    			energyFlowInChart.resize();
+    			const { data: chatInData } = yield transactionsService.fetchEnergyFlow(start, end);
+    			const { energyFromCommunity, energyFromPublicGrid, energyToCommunity, energyToPublicGrid } = chatInData;
+    			chartIn.data.datasets[0].data = [energyToCommunity, energyToPublicGrid];
+    			chartOut.data.datasets[0].data = [energyFromCommunity, energyFromPublicGrid];
+    			chartIn.update();
+    			chartOut.update();
     		});
     	}
 
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console_1.warn(`<EnergyFlowChart> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<EnergyFlowChart> was created with unknown prop '${key}'`);
     	});
 
     	function input0_input_handler() {
@@ -91819,19 +89833,17 @@
 
     	$$self.$capture_state = () => ({
     		__awaiter,
-    		parse,
     		subDays,
     		onMount,
     		createChart,
     		Card,
     		transactionsService,
+    		energyFlowOptions,
     		startDate,
     		endDate,
-    		energyFlowInChart,
-    		energyFlowOutChart,
-    		energyFlowInDataset,
-    		energyFlowOutDataset,
-    		options,
+    		chartIn,
+    		chartOut,
+    		dataset,
     		labels,
     		updateChart
     	});
@@ -91840,11 +89852,9 @@
     		if ("__awaiter" in $$props) __awaiter = $$props.__awaiter;
     		if ("startDate" in $$props) $$invalidate(0, startDate = $$props.startDate);
     		if ("endDate" in $$props) $$invalidate(1, endDate = $$props.endDate);
-    		if ("energyFlowInChart" in $$props) energyFlowInChart = $$props.energyFlowInChart;
-    		if ("energyFlowOutChart" in $$props) energyFlowOutChart = $$props.energyFlowOutChart;
-    		if ("energyFlowInDataset" in $$props) energyFlowInDataset = $$props.energyFlowInDataset;
-    		if ("energyFlowOutDataset" in $$props) energyFlowOutDataset = $$props.energyFlowOutDataset;
-    		if ("options" in $$props) options = $$props.options;
+    		if ("chartIn" in $$props) chartIn = $$props.chartIn;
+    		if ("chartOut" in $$props) chartOut = $$props.chartOut;
+    		if ("dataset" in $$props) dataset = $$props.dataset;
     		if ("labels" in $$props) labels = $$props.labels;
     	};
 
@@ -92114,10 +90124,36 @@
         }),
     };
 
+    const priceHistoryOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: { enabled: true },
+        },
+        scales: {
+            x: {
+                grid: { display: false, borderColor: "#F3F4F6" },
+                ticks: {
+                    font: { size: 14, family: "Inter" },
+                    color: "rgb(156, 163, 175)",
+                },
+            },
+            y: {
+                beginAtZero: true,
+                grid: { drawBorder: false, color: "#F3F4F6" },
+                ticks: {
+                    font: { size: 14, family: "Inter" },
+                    color: "rgb(156, 163, 175)",
+                },
+            },
+        },
+    };
+
     /* src/trading/components/TradingPriceHistory.svelte generated by Svelte v3.37.0 */
     const file$d = "src/trading/components/TradingPriceHistory.svelte";
 
-    // (74:0) <Card title="Price History">
+    // (50:0) <Card title="Price History">
     function create_default_slot$8(ctx) {
     	let canvas;
 
@@ -92126,7 +90162,7 @@
     			canvas = element("canvas");
     			attr_dev(canvas, "id", "priceHistoryChart");
     			attr_dev(canvas, "class", "w-full");
-    			add_location(canvas, file$d, 77, 2, 2841);
+    			add_location(canvas, file$d, 53, 2, 2227);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, canvas, anchor);
@@ -92140,14 +90176,14 @@
     		block,
     		id: create_default_slot$8.name,
     		type: "slot",
-    		source: "(74:0) <Card title=\\\"Price History\\\">",
+    		source: "(50:0) <Card title=\\\"Price History\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (75:2) 
+    // (51:2) 
     function create_action_slot(ctx) {
     	let span;
     	let intervalselector;
@@ -92163,7 +90199,7 @@
     			span = element("span");
     			create_component(intervalselector.$$.fragment);
     			attr_dev(span, "slot", "action");
-    			add_location(span, file$d, 74, 2, 2736);
+    			add_location(span, file$d, 50, 2, 2122);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, span, anchor);
@@ -92190,7 +90226,7 @@
     		block,
     		id: create_action_slot.name,
     		type: "slot",
-    		source: "(75:2) ",
+    		source: "(51:2) ",
     		ctx
     	});
 
@@ -92227,7 +90263,7 @@
     		p: function update(ctx, [dirty]) {
     			const card_changes = {};
 
-    			if (dirty & /*$$scope*/ 256) {
+    			if (dirty & /*$$scope*/ 128) {
     				card_changes.$$scope = { dirty, ctx };
     			}
 
@@ -92316,37 +90352,11 @@
     		}
     	];
 
-    	let options = {
-    		responsive: true,
-    		maintainAspectRatio: false,
-    		plugins: {
-    			legend: { display: false },
-    			tooltip: { enabled: true }
-    		},
-    		scales: {
-    			x: {
-    				grid: { display: false, borderColor: "#F3F4F6" },
-    				ticks: {
-    					font: { size: 14, family: "Inter" },
-    					color: "rgb(156, 163, 175)"
-    				}
-    			},
-    			y: {
-    				beginAtZero: true,
-    				grid: { drawBorder: false, color: "#F3F4F6" },
-    				ticks: {
-    					font: { size: 14, family: "Inter" },
-    					color: "rgb(156, 163, 175)"
-    				}
-    			}
-    		}
-    	};
-
-    	onMount(() => __awaiter(void 0, void 0, void 0, function* () {
+    	onMount(() => {
     		const canvas = document.getElementById("priceHistoryChart");
-    		chart = createChart(canvas.getContext("2d"), "line", dataset, labels, options);
+    		chart = createChart(canvas.getContext("2d"), "line", dataset, labels, priceHistoryOptions);
     		updateChart();
-    	}));
+    	});
 
     	function updateChart(interval = "1h") {
     		return __awaiter(this, void 0, void 0, function* () {
@@ -92375,11 +90385,11 @@
     		intervalToChartLabel,
     		transactionsService,
     		IntervalSelector,
+    		priceHistoryOptions,
     		chart,
     		interval,
     		labels,
     		dataset,
-    		options,
     		updateChart
     	});
 
@@ -92389,7 +90399,6 @@
     		if ("interval" in $$props) interval = $$props.interval;
     		if ("labels" in $$props) labels = $$props.labels;
     		if ("dataset" in $$props) dataset = $$props.dataset;
-    		if ("options" in $$props) options = $$props.options;
     	};
 
     	if ($$props && "$$inject" in $$props) {
@@ -92578,7 +90587,7 @@
     function create_then_block$2(ctx) {
     	get_then_context$2(ctx);
     	let t0;
-    	let t1_value = /*data*/ ctx[0] + "";
+    	let t1_value = /*data*/ ctx[0].toFixed(2) + "";
     	let t1;
     	let t2;
     	let span;
@@ -92591,7 +90600,7 @@
     			span = element("span");
     			span.textContent = "/ kWh";
     			attr_dev(span, "class", "text-sm text-gray-400 font-normal");
-    			add_location(span, file$b, 14, 18, 569);
+    			add_location(span, file$b, 14, 29, 580);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, t0, anchor);
@@ -92751,10 +90760,10 @@
     			attr_dev(span0, "class", "text-2xl font-semibold text-gray-50");
     			add_location(span0, file$b, 10, 6, 400);
     			attr_dev(span1, "class", "text-sm text-gray-400");
-    			add_location(span1, file$b, 17, 6, 668);
+    			add_location(span1, file$b, 17, 6, 679);
     			attr_dev(div0, "class", "flex flex-col");
     			add_location(div0, file$b, 9, 4, 366);
-    			add_location(div1, file$b, 19, 4, 740);
+    			add_location(div1, file$b, 19, 4, 751);
     			attr_dev(div2, "class", "flex justify-between items-center");
     			add_location(div2, file$b, 8, 2, 314);
     		},
@@ -93186,7 +91195,7 @@
     /* src/trading/routes/Trading.svelte generated by Svelte v3.37.0 */
     const file$9 = "src/trading/routes/Trading.svelte";
 
-    // (9:0) <Shell title="Trading">
+    // (8:0) <Shell title="Trading">
     function create_default_slot$5(ctx) {
     	let div5;
     	let div0;
@@ -93218,17 +91227,17 @@
     			div2 = element("div");
     			create_component(tradingpricessettings.$$.fragment);
     			attr_dev(div0, "class", "col-span-12 lg:col-span-8");
-    			add_location(div0, file$9, 10, 4, 475);
+    			add_location(div0, file$9, 9, 4, 393);
     			attr_dev(div1, "class", "mb-12");
-    			add_location(div1, file$9, 15, 8, 649);
+    			add_location(div1, file$9, 14, 8, 567);
     			attr_dev(div2, "class", "h-full");
-    			add_location(div2, file$9, 18, 8, 726);
+    			add_location(div2, file$9, 17, 8, 644);
     			attr_dev(div3, "class", "flex flex-col h-full");
-    			add_location(div3, file$9, 14, 6, 606);
+    			add_location(div3, file$9, 13, 6, 524);
     			attr_dev(div4, "class", "col-span-12 lg:col-span-4");
-    			add_location(div4, file$9, 13, 4, 560);
+    			add_location(div4, file$9, 12, 4, 478);
     			attr_dev(div5, "class", "grid grid-cols-12 gap-12");
-    			add_location(div5, file$9, 9, 2, 432);
+    			add_location(div5, file$9, 8, 2, 350);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div5, anchor);
@@ -93269,7 +91278,7 @@
     		block,
     		id: create_default_slot$5.name,
     		type: "slot",
-    		source: "(9:0) <Shell title=\\\"Trading\\\">",
+    		source: "(8:0) <Shell title=\\\"Trading\\\">",
     		ctx
     	});
 
@@ -93345,7 +91354,6 @@
 
     	$$self.$capture_state = () => ({
     		Shell,
-    		notificationsService,
     		TradingPriceHistory,
     		TradingPricesLatest,
     		TradingPricesSettings
@@ -93635,7 +91643,7 @@
     /* src/wallet/components/WalletInformation.svelte generated by Svelte v3.37.0 */
     const file$7 = "src/wallet/components/WalletInformation.svelte";
 
-    // (36:2) {:else}
+    // (35:2) {:else}
     function create_else_block$1(ctx) {
     	let div1;
     	let div0;
@@ -93668,15 +91676,15 @@
     			button = element("button");
     			button.textContent = "Import";
     			attr_dev(div0, "class", "flex items-center bg-yellow-100 text-yellow-800 p-2 rounded-md \n      text-sm my-8");
-    			add_location(div0, file$7, 37, 6, 1231);
-    			add_location(div1, file$7, 36, 4, 1219);
+    			add_location(div0, file$7, 36, 6, 1252);
+    			add_location(div1, file$7, 35, 4, 1240);
     			attr_dev(input, "class", "input mr-3");
     			attr_dev(input, "placeholder", "Private key");
-    			add_location(input, file$7, 46, 6, 1526);
+    			add_location(input, file$7, 45, 6, 1547);
     			attr_dev(button, "class", "btn-secundary flex items-center");
-    			add_location(button, file$7, 47, 6, 1587);
+    			add_location(button, file$7, 46, 6, 1632);
     			attr_dev(div2, "class", "flex items-center");
-    			add_location(div2, file$7, 45, 4, 1488);
+    			add_location(div2, file$7, 44, 4, 1509);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -93686,16 +91694,25 @@
     			insert_dev(target, t1, anchor);
     			insert_dev(target, div2, anchor);
     			append_dev(div2, input);
+    			set_input_value(input, /*privateKey*/ ctx[0]);
     			append_dev(div2, t2);
     			append_dev(div2, button);
     			current = true;
 
     			if (!mounted) {
-    				dispose = listen_dev(button, "click", /*click_handler_1*/ ctx[3], false, false, false);
+    				dispose = [
+    					listen_dev(input, "input", /*input_input_handler*/ ctx[4]),
+    					listen_dev(button, "click", /*click_handler_1*/ ctx[5], false, false, false)
+    				];
+
     				mounted = true;
     			}
     		},
-    		p: noop$2,
+    		p: function update(ctx, dirty) {
+    			if (dirty & /*privateKey*/ 1 && input.value !== /*privateKey*/ ctx[0]) {
+    				set_input_value(input, /*privateKey*/ ctx[0]);
+    			}
+    		},
     		i: function intro(local) {
     			if (current) return;
     			transition_in(icon.$$.fragment, local);
@@ -93711,7 +91728,7 @@
     			if (detaching) detach_dev(t1);
     			if (detaching) detach_dev(div2);
     			mounted = false;
-    			dispose();
+    			run_all(dispose);
     		}
     	};
 
@@ -93719,14 +91736,14 @@
     		block,
     		id: create_else_block$1.name,
     		type: "else",
-    		source: "(36:2) {:else}",
+    		source: "(35:2) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (18:2) {#if $hederaAccountInfo.privateKey}
+    // (17:2) {#if $hederaAccountInfo.privateKey}
     function create_if_block$1(ctx) {
     	let dl;
     	let div;
@@ -93753,17 +91770,17 @@
     			button = element("button");
     			button.textContent = "Export";
     			attr_dev(dt, "class", "text-sm font-medium text-gray-500");
-    			add_location(dt, file$7, 20, 8, 735);
+    			add_location(dt, file$7, 19, 8, 756);
     			attr_dev(a, "target", "_blank");
-    			attr_dev(a, "href", a_href_value = "https://explorer.kabuto.sh/testnet/id/" + /*$hederaAccountInfo*/ ctx[0].accountId);
+    			attr_dev(a, "href", a_href_value = "https://explorer.kabuto.sh/testnet/id/" + /*$hederaAccountInfo*/ ctx[1].accountId);
     			attr_dev(a, "class", "underline text-green-800 mt-1 text-sm sm:mt-0 sm:col-span-2");
-    			add_location(a, file$7, 21, 8, 802);
+    			add_location(a, file$7, 20, 8, 823);
     			attr_dev(div, "class", "py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 ");
-    			add_location(div, file$7, 19, 6, 667);
+    			add_location(div, file$7, 18, 6, 688);
     			attr_dev(dl, "class", "mb-4");
-    			add_location(dl, file$7, 18, 4, 643);
+    			add_location(dl, file$7, 17, 4, 664);
     			attr_dev(button, "class", "btn-secundary flex items-center");
-    			add_location(button, file$7, 29, 4, 1062);
+    			add_location(button, file$7, 28, 4, 1083);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, dl, anchor);
@@ -93776,12 +91793,12 @@
     			insert_dev(target, button, anchor);
 
     			if (!mounted) {
-    				dispose = listen_dev(button, "click", /*click_handler*/ ctx[2], false, false, false);
+    				dispose = listen_dev(button, "click", /*click_handler*/ ctx[3], false, false, false);
     				mounted = true;
     			}
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*$hederaAccountInfo*/ 1 && a_href_value !== (a_href_value = "https://explorer.kabuto.sh/testnet/id/" + /*$hederaAccountInfo*/ ctx[0].accountId)) {
+    			if (dirty & /*$hederaAccountInfo*/ 2 && a_href_value !== (a_href_value = "https://explorer.kabuto.sh/testnet/id/" + /*$hederaAccountInfo*/ ctx[1].accountId)) {
     				attr_dev(a, "href", a_href_value);
     			}
     		},
@@ -93800,21 +91817,21 @@
     		block,
     		id: create_if_block$1.name,
     		type: "if",
-    		source: "(18:2) {#if $hederaAccountInfo.privateKey}",
+    		source: "(17:2) {#if $hederaAccountInfo.privateKey}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (9:0) <Card title="Informations">
+    // (8:0) <Card title="Informations">
     function create_default_slot$3(ctx) {
     	let dl;
     	let div;
     	let dt;
     	let t1;
     	let dd;
-    	let t2_value = /*$hederaAccountInfo*/ ctx[0].accountId + "";
+    	let t2_value = /*$hederaAccountInfo*/ ctx[1].accountId + "";
     	let t2;
     	let t3;
     	let current_block_type_index;
@@ -93825,7 +91842,7 @@
     	const if_blocks = [];
 
     	function select_block_type(ctx, dirty) {
-    		if (/*$hederaAccountInfo*/ ctx[0].privateKey) return 0;
+    		if (/*$hederaAccountInfo*/ ctx[1].privateKey) return 0;
     		return 1;
     	}
 
@@ -93845,13 +91862,13 @@
     			if_block.c();
     			if_block_anchor = empty();
     			attr_dev(dt, "class", "text-sm font-medium text-gray-500");
-    			add_location(dt, file$7, 11, 6, 401);
+    			add_location(dt, file$7, 10, 6, 422);
     			attr_dev(dd, "class", "mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2");
-    			add_location(dd, file$7, 12, 6, 469);
+    			add_location(dd, file$7, 11, 6, 490);
     			attr_dev(div, "class", "py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 ");
-    			add_location(div, file$7, 10, 4, 335);
+    			add_location(div, file$7, 9, 4, 356);
     			attr_dev(dl, "class", "border-b border-gray-200");
-    			add_location(dl, file$7, 9, 2, 293);
+    			add_location(dl, file$7, 8, 2, 314);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, dl, anchor);
@@ -93866,7 +91883,7 @@
     			current = true;
     		},
     		p: function update(ctx, dirty) {
-    			if ((!current || dirty & /*$hederaAccountInfo*/ 1) && t2_value !== (t2_value = /*$hederaAccountInfo*/ ctx[0].accountId + "")) set_data_dev(t2, t2_value);
+    			if ((!current || dirty & /*$hederaAccountInfo*/ 2) && t2_value !== (t2_value = /*$hederaAccountInfo*/ ctx[1].accountId + "")) set_data_dev(t2, t2_value);
     			let previous_block_index = current_block_type_index;
     			current_block_type_index = select_block_type(ctx);
 
@@ -93914,7 +91931,7 @@
     		block,
     		id: create_default_slot$3.name,
     		type: "slot",
-    		source: "(9:0) <Card title=\\\"Informations\\\">",
+    		source: "(8:0) <Card title=\\\"Informations\\\">",
     		ctx
     	});
 
@@ -93948,7 +91965,7 @@
     		p: function update(ctx, [dirty]) {
     			const card_changes = {};
 
-    			if (dirty & /*$$scope, $hederaAccountInfo*/ 17) {
+    			if (dirty & /*$$scope, $hederaAccountInfo, privateKey*/ 67) {
     				card_changes.$$scope = { dirty, ctx };
     			}
 
@@ -93985,7 +92002,8 @@
     	validate_slots("WalletInformation", slots, []);
     	const { hederaAccountInfo } = hederaService;
     	validate_store(hederaAccountInfo, "hederaAccountInfo");
-    	component_subscribe($$self, hederaAccountInfo, value => $$invalidate(0, $hederaAccountInfo = value));
+    	component_subscribe($$self, hederaAccountInfo, value => $$invalidate(1, $hederaAccountInfo = value));
+    	let privateKey = "";
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
@@ -93993,7 +92011,13 @@
     	});
 
     	const click_handler = () => hederaService.exportPrivateKey();
-    	const click_handler_1 = () => hederaService.exportPrivateKey();
+
+    	function input_input_handler() {
+    		privateKey = this.value;
+    		$$invalidate(0, privateKey);
+    	}
+
+    	const click_handler_1 = () => hederaService.importPrivateKey(privateKey);
 
     	$$self.$capture_state = () => ({
     		Icon,
@@ -94001,10 +92025,26 @@
     		Card,
     		hederaService,
     		hederaAccountInfo,
+    		privateKey,
     		$hederaAccountInfo
     	});
 
-    	return [$hederaAccountInfo, hederaAccountInfo, click_handler, click_handler_1];
+    	$$self.$inject_state = $$props => {
+    		if ("privateKey" in $$props) $$invalidate(0, privateKey = $$props.privateKey);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [
+    		privateKey,
+    		$hederaAccountInfo,
+    		hederaAccountInfo,
+    		click_handler,
+    		input_input_handler,
+    		click_handler_1
+    	];
     }
 
     class WalletInformation extends SvelteComponentDev {
@@ -94705,8 +92745,8 @@
     	}
     }
 
-    /* src/wallet/components/WalletTransactionsFilter.svelte generated by Svelte v3.37.0 */
-    const file$3 = "src/wallet/components/WalletTransactionsFilter.svelte";
+    /* src/wallet/components/WalletPaymentsFilter.svelte generated by Svelte v3.37.0 */
+    const file$3 = "src/wallet/components/WalletPaymentsFilter.svelte";
 
     // (6:2) <Dropdown name="Filter" buttonClass="btn-secundary" width={96}>
     function create_default_slot$2(ctx) {
@@ -95002,12 +93042,12 @@
 
     function instance$3($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots("WalletTransactionsFilter", slots, []);
+    	validate_slots("WalletPaymentsFilter", slots, []);
     	let type = "buy";
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<WalletTransactionsFilter> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<WalletPaymentsFilter> was created with unknown prop '${key}'`);
     	});
 
     	const $$binding_groups = [[]];
@@ -95046,22 +93086,22 @@
     	];
     }
 
-    class WalletTransactionsFilter extends SvelteComponentDev {
+    class WalletPaymentsFilter extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
     		init(this, options, instance$3, create_fragment$3, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
-    			tagName: "WalletTransactionsFilter",
+    			tagName: "WalletPaymentsFilter",
     			options,
     			id: create_fragment$3.name
     		});
     	}
     }
 
-    /* src/wallet/components/WalletTransactions.svelte generated by Svelte v3.37.0 */
-    const file$2 = "src/wallet/components/WalletTransactions.svelte";
+    /* src/wallet/components/WalletPayments.svelte generated by Svelte v3.37.0 */
+    const file$2 = "src/wallet/components/WalletPayments.svelte";
 
     function get_then_context(ctx) {
     	ctx[2] = ctx[3].data;
@@ -95095,7 +93135,7 @@
     	return block;
     }
 
-    // (22:2) {:then { data }}
+    // (21:2) {:then { data }}
     function create_then_block(ctx) {
     	get_then_context(ctx);
     	let t;
@@ -95199,14 +93239,14 @@
     		block,
     		id: create_then_block.name,
     		type: "then",
-    		source: "(22:2) {:then { data }}",
+    		source: "(21:2) {:then { data }}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (23:4) {#if data.length === 0}
+    // (22:4) {#if data.length === 0}
     function create_if_block_1(ctx) {
     	let tablenotfound;
     	let current;
@@ -95238,14 +93278,14 @@
     		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(23:4) {#if data.length === 0}",
+    		source: "(22:4) {#if data.length === 0}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (35:12) {:else}
+    // (34:12) {:else}
     function create_else_block(ctx) {
     	let badge;
     	let current;
@@ -95294,14 +93334,14 @@
     		block,
     		id: create_else_block.name,
     		type: "else",
-    		source: "(35:12) {:else}",
+    		source: "(34:12) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (33:12) {#if payment.consumerId === $user.id}
+    // (32:12) {#if payment.consumerId === $user.id}
     function create_if_block(ctx) {
     	let badge;
     	let current;
@@ -95350,14 +93390,14 @@
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(33:12) {#if payment.consumerId === $user.id}",
+    		source: "(32:12) {#if payment.consumerId === $user.id}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (36:14) <Badge color="green">
+    // (35:14) <Badge color="green">
     function create_default_slot_2(ctx) {
     	let t0;
     	let t1_value = /*payment*/ ctx[4].amount.toFixed(2) + "";
@@ -95383,14 +93423,14 @@
     		block,
     		id: create_default_slot_2.name,
     		type: "slot",
-    		source: "(36:14) <Badge color=\\\"green\\\">",
+    		source: "(35:14) <Badge color=\\\"green\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (34:14) <Badge color="red">
+    // (33:14) <Badge color="red">
     function create_default_slot_1(ctx) {
     	let t0;
     	let t1_value = /*payment*/ ctx[4].amount.toFixed(2) + "";
@@ -95416,14 +93456,14 @@
     		block,
     		id: create_default_slot_1.name,
     		type: "slot",
-    		source: "(34:14) <Badge color=\\\"red\\\">",
+    		source: "(33:14) <Badge color=\\\"red\\\">",
     		ctx
     	});
 
     	return block;
     }
 
-    // (26:4) {#each data as payment}
+    // (25:4) {#each data as payment}
     function create_each_block(ctx) {
     	let tr;
     	let td0;
@@ -95484,28 +93524,28 @@
     			button.textContent = "Invoice";
     			t9 = space();
     			attr_dev(div0, "class", "text-sm text-gray-900");
-    			add_location(div0, file$2, 28, 10, 1143);
+    			add_location(div0, file$2, 27, 10, 1070);
     			attr_dev(td0, "class", "px-6 py-4 whitespace-nowrap");
-    			add_location(td0, file$2, 27, 8, 1092);
+    			add_location(td0, file$2, 26, 8, 1019);
     			attr_dev(div1, "class", "flex items-center");
-    			add_location(div1, file$2, 31, 10, 1263);
+    			add_location(div1, file$2, 30, 10, 1190);
     			attr_dev(td1, "class", "px-6 py-4 whitespace-nowrap");
-    			add_location(td1, file$2, 30, 8, 1212);
+    			add_location(td1, file$2, 29, 8, 1139);
     			attr_dev(div2, "class", "text-sm text-gray-900");
-    			add_location(div2, file$2, 40, 10, 1615);
+    			add_location(div2, file$2, 39, 10, 1542);
     			attr_dev(td2, "class", "px-6 py-4 whitespace-nowrap");
-    			add_location(td2, file$2, 39, 8, 1564);
+    			add_location(td2, file$2, 38, 8, 1491);
     			attr_dev(a, "class", "underline text-green-800");
     			attr_dev(a, "href", "https://explorer.kabuto.sh/testnet/transaction/" + /*payment*/ ctx[4].hederaTransactionId);
     			attr_dev(a, "target", "_blank");
-    			add_location(a, file$2, 45, 10, 1808);
+    			add_location(a, file$2, 44, 10, 1735);
     			attr_dev(td3, "class", "px-6 py-4 whitespace-nowrap");
-    			add_location(td3, file$2, 44, 8, 1757);
+    			add_location(td3, file$2, 43, 8, 1684);
     			attr_dev(button, "class", "btn-secundary");
-    			add_location(button, file$2, 52, 10, 2076);
+    			add_location(button, file$2, 51, 10, 2003);
     			attr_dev(td4, "class", "px-6 py-4 whitespace-nowrap");
-    			add_location(td4, file$2, 51, 8, 2025);
-    			add_location(tr, file$2, 26, 6, 1079);
+    			add_location(td4, file$2, 50, 8, 1952);
+    			add_location(tr, file$2, 25, 6, 1006);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, tr, anchor);
@@ -95576,14 +93616,14 @@
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(26:4) {#each data as payment}",
+    		source: "(25:4) {#each data as payment}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (20:42)      <TableSkeleton headersNum={5}
+    // (19:42)      <TableSkeleton headersNum={5}
     function create_pending_block(ctx) {
     	let tableskeleton;
     	let current;
@@ -95620,14 +93660,14 @@
     		block,
     		id: create_pending_block.name,
     		type: "pending",
-    		source: "(20:42)      <TableSkeleton headersNum={5}",
+    		source: "(19:42)      <TableSkeleton headersNum={5}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (19:0) <Table headers={["Amount", "Price", "Date", "Explore", "Invoice"]}>
+    // (18:0) <Table headers={["Amount", "Price", "Date", "Explore", "Invoice"]}>
     function create_default_slot$1(ctx) {
     	let await_block_anchor;
     	let current;
@@ -95692,7 +93732,7 @@
     		block,
     		id: create_default_slot$1.name,
     		type: "slot",
-    		source: "(19:0) <Table headers={[\\\"Amount\\\", \\\"Price\\\", \\\"Date\\\", \\\"Explore\\\", \\\"Invoice\\\"]}>",
+    		source: "(18:0) <Table headers={[\\\"Amount\\\", \\\"Price\\\", \\\"Date\\\", \\\"Explore\\\", \\\"Invoice\\\"]}>",
     		ctx
     	});
 
@@ -95703,11 +93743,11 @@
     	let div;
     	let h3;
     	let t1;
-    	let wallettransactionsfilter;
+    	let walletpaymentsfilter;
     	let t2;
     	let table;
     	let current;
-    	wallettransactionsfilter = new WalletTransactionsFilter({ $$inline: true });
+    	walletpaymentsfilter = new WalletPaymentsFilter({ $$inline: true });
 
     	table = new Table({
     			props: {
@@ -95722,15 +93762,15 @@
     		c: function create() {
     			div = element("div");
     			h3 = element("h3");
-    			h3.textContent = "Latest Transactions";
+    			h3.textContent = "Latest Payments";
     			t1 = space();
-    			create_component(wallettransactionsfilter.$$.fragment);
+    			create_component(walletpaymentsfilter.$$.fragment);
     			t2 = space();
     			create_component(table.$$.fragment);
     			attr_dev(h3, "class", "text-gray-900 text-xl font-semibold");
-    			add_location(h3, file$2, 14, 2, 677);
+    			add_location(h3, file$2, 13, 2, 612);
     			attr_dev(div, "class", "flex items-center justify-between mb-6");
-    			add_location(div, file$2, 13, 0, 622);
+    			add_location(div, file$2, 12, 0, 557);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -95739,7 +93779,7 @@
     			insert_dev(target, div, anchor);
     			append_dev(div, h3);
     			append_dev(div, t1);
-    			mount_component(wallettransactionsfilter, div, null);
+    			mount_component(walletpaymentsfilter, div, null);
     			insert_dev(target, t2, anchor);
     			mount_component(table, target, anchor);
     			current = true;
@@ -95755,18 +93795,18 @@
     		},
     		i: function intro(local) {
     			if (current) return;
-    			transition_in(wallettransactionsfilter.$$.fragment, local);
+    			transition_in(walletpaymentsfilter.$$.fragment, local);
     			transition_in(table.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
-    			transition_out(wallettransactionsfilter.$$.fragment, local);
+    			transition_out(walletpaymentsfilter.$$.fragment, local);
     			transition_out(table.$$.fragment, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(div);
-    			destroy_component(wallettransactionsfilter);
+    			destroy_component(walletpaymentsfilter);
     			if (detaching) detach_dev(t2);
     			destroy_component(table, detaching);
     		}
@@ -95786,27 +93826,25 @@
     function instance$2($$self, $$props, $$invalidate) {
     	let $user;
     	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots("WalletTransactions", slots, []);
+    	validate_slots("WalletPayments", slots, []);
     	const { user } = authService;
     	validate_store(user, "user");
     	component_subscribe($$self, user, value => $$invalidate(0, $user = value));
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<WalletTransactions> was created with unknown prop '${key}'`);
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<WalletPayments> was created with unknown prop '${key}'`);
     	});
 
     	$$self.$capture_state = () => ({
     		formatDistanceToNow,
-    		Icon,
-    		ChevronDown,
     		Badge,
     		Table,
     		TableNotFound,
     		TableSkeleton,
     		authService,
     		paymentsService,
-    		WalletTransactionsFilter,
+    		WalletPaymentsFilter,
     		user,
     		$user
     	});
@@ -95814,14 +93852,14 @@
     	return [$user, user];
     }
 
-    class WalletTransactions extends SvelteComponentDev {
+    class WalletPayments extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
     		init(this, options, instance$2, create_fragment$2, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
-    			tagName: "WalletTransactions",
+    			tagName: "WalletPayments",
     			options,
     			id: create_fragment$2.name
     		});
@@ -95841,11 +93879,11 @@
     	let walletinformation;
     	let t1;
     	let div2;
-    	let wallettransactions;
+    	let walletpayments;
     	let current;
     	walletbalance = new WalletBalance({ $$inline: true });
     	walletinformation = new WalletInformation({ $$inline: true });
-    	wallettransactions = new WalletTransactions({ $$inline: true });
+    	walletpayments = new WalletPayments({ $$inline: true });
 
     	const block = {
     		c: function create() {
@@ -95857,15 +93895,15 @@
     			create_component(walletinformation.$$.fragment);
     			t1 = space();
     			div2 = element("div");
-    			create_component(wallettransactions.$$.fragment);
+    			create_component(walletpayments.$$.fragment);
     			attr_dev(div0, "class", "mb-8");
-    			add_location(div0, file$1, 10, 6, 430);
+    			add_location(div0, file$1, 10, 6, 422);
     			attr_dev(div1, "class", "flex flex-col col-span-12 lg:col-span-4");
-    			add_location(div1, file$1, 9, 4, 370);
+    			add_location(div1, file$1, 9, 4, 362);
     			attr_dev(div2, "class", "col-span-12 lg:col-span-8");
-    			add_location(div2, file$1, 15, 4, 531);
+    			add_location(div2, file$1, 15, 4, 523);
     			attr_dev(div3, "class", "grid grid-cols-12 gap-12");
-    			add_location(div3, file$1, 8, 2, 327);
+    			add_location(div3, file$1, 8, 2, 319);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div3, anchor);
@@ -95876,27 +93914,27 @@
     			mount_component(walletinformation, div1, null);
     			append_dev(div3, t1);
     			append_dev(div3, div2);
-    			mount_component(wallettransactions, div2, null);
+    			mount_component(walletpayments, div2, null);
     			current = true;
     		},
     		i: function intro(local) {
     			if (current) return;
     			transition_in(walletbalance.$$.fragment, local);
     			transition_in(walletinformation.$$.fragment, local);
-    			transition_in(wallettransactions.$$.fragment, local);
+    			transition_in(walletpayments.$$.fragment, local);
     			current = true;
     		},
     		o: function outro(local) {
     			transition_out(walletbalance.$$.fragment, local);
     			transition_out(walletinformation.$$.fragment, local);
-    			transition_out(wallettransactions.$$.fragment, local);
+    			transition_out(walletpayments.$$.fragment, local);
     			current = false;
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(div3);
     			destroy_component(walletbalance);
     			destroy_component(walletinformation);
-    			destroy_component(wallettransactions);
+    			destroy_component(walletpayments);
     		}
     	};
 
@@ -95982,7 +94020,7 @@
     		Shell,
     		WalletBalance,
     		WalletInformation,
-    		WalletTransactions
+    		WalletPayments
     	});
 
     	return [];

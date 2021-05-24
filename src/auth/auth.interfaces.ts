@@ -11,6 +11,7 @@ export interface User {
   birthdate: string;
   picture: string;
   role: Roles;
+  hederaAccountId: string;
 }
 
 export interface LoginDto {

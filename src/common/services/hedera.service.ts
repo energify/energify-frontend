@@ -4,9 +4,10 @@ import {
   Client,
   AccountCreateTransaction,
   AccountBalanceQuery,
+  BadKeyError,
 } from "@hashgraph/sdk";
 import { get, writable } from "svelte/store";
-import type { HederaAccountInfo } from "./hedera.interfaces";
+import type { HederaAccountInfo } from "../interfaces/hedera.interfaces";
 
 export class HederaService {
   hederaAccountInfo = writable<HederaAccountInfo>(
@@ -21,15 +22,22 @@ export class HederaService {
     );
 
     const { privateKey, accountId } = get(this.hederaAccountInfo);
+
     this.client = Client.forTestnet();
 
-    if (!accountId) {
+    if (!privateKey) {
       this.client.setOperator(
         "0.0.460923",
         "302e020100300506032b657004220420c6363cedb392f602bcebf78edfb0541812534f492f4d367e32939d7247705884"
       );
     } else {
-      this.client.setOperator(accountId, privateKey);
+      try {
+        this.client.setOperator(accountId, privateKey);
+      } catch (e) {
+        if (e instanceof BadKeyError) {
+          this.hederaAccountInfo.update((info) => ({ ...info, privateKey: undefined }));
+        }
+      }
     }
   }
 

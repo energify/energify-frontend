@@ -2,7 +2,7 @@
   import Shell from "../../common/components/shell/Shell.svelte";
   import WalletBalance from "../components/WalletBalance.svelte";
   import WalletInformation from "../components/WalletInformation.svelte";
-  import WalletTransactions from "../components/WalletTransactions.svelte";
+  import WalletPayments from "../components/WalletPayments.svelte";
 </script>
 
 <Shell title="Wallet">
@@ -14,7 +14,7 @@
       <WalletInformation />
     </div>
     <div class="col-span-12 lg:col-span-8">
-      <WalletTransactions />
+      <WalletPayments />
     </div>
   </div>
 </Shell>

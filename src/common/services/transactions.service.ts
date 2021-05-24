@@ -1,26 +1,34 @@
 import { request } from "../api.util";
 import { format as formatDate } from "date-fns";
-import type { TransactionsStats } from "./transactions.interfaces";
 
 export class TransactionsService {
   fetchPriceLast24Hours() {
-    return request<number>(`/transactions/price-24hours`, "GET");
+    return { data: 1.2 };
   }
 
   fetchPriceHistory(interval: string, scale: number) {
-    return request<number[]>(`/transactions/price-history/${interval}/${scale}`, "GET");
+    const data = new Array();
+    for (let i = 0; i < scale; i++) data.push(Math.random() * 1.2);
+    return { data };
   }
 
   fetchEnergyHistory(interval: string, scale: number) {
-    return request<number[]>(`/transactions/energy-history/${interval}/${scale}`, "GET");
+    const data = new Array();
+    for (let i = 0; i < scale; i++) data.push(Math.random() * 1.2);
+    return { data };
   }
 
   fetchEnergyFlow(start: Date, end: Date) {
     const formatedStart = formatDate(start, "MM-dd-yyyy HH:mm:ss");
     const formatedEnd = formatDate(end, "MM-dd-yyyy HH:mm:ss");
-    return request<TransactionsStats>(
-      `/transactions/energy-flow/${formatedStart}/${formatedEnd}`,
-      "GET"
-    );
+
+    return {
+      data: {
+        energyFromCommunity: 100,
+        energyFromPublicGrid: 20,
+        energyToCommunity: 120,
+        energyToPublicGrid: 80,
+      },
+    };
   }
 }

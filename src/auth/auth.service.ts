@@ -1,5 +1,6 @@
 import { get, writable } from "svelte/store";
 import { request } from "../common/api.util";
+import { hederaService } from "../common/services/services.injector";
 import {
   User,
   LoginDto,
@@ -42,6 +43,10 @@ export class AuthService {
       if (!get(this.user).email) {
         const { data } = await this.details();
         this.user.set(data);
+        hederaService.hederaAccountInfo.update((info) => ({
+          ...info,
+          accountId: data.hederaAccountId,
+        }));
       }
       return true;
     } catch (e) {

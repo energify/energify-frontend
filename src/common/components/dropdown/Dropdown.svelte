@@ -33,8 +33,8 @@
     class:opacity-0={!isMenuOpen}
     class:opacity-100={isMenuOpen}
     class:hidden={!isMenuRendered}
-    class="transition ease-out duration-100 origin-top-right absolute right-0 mt-2 w-{width} z-30
-     rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+    class="transition ease-out duration-100 origin-top-right absolute right-0 mt-2 w-{width}
+     rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-30"
     role="menu"
     aria-orientation="vertical"
     aria-labelledby="menu-button"

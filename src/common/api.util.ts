@@ -7,7 +7,7 @@ export interface ApiResponse<T> {
   };
 }
 
-let baseUrl = "http://localhost:8080";
+let baseUrl = "http://energify.av.it.pt";
 
 export async function request<T>(
   endpoint: string,

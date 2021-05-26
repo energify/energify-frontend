@@ -4,7 +4,10 @@
   import { onMount } from "svelte";
   import { createChart } from "../../common/chartjs.util";
   import Card from "../../common/components/card/Card.svelte";
-  import { transactionsService } from "../../common/services/services.injector";
+  import {
+    notificationsService,
+    transactionsService,
+  } from "../../common/services/services.injector";
   import { energyFlowOptions } from "../chart-options/energy-flow.options";
 
   let startDate: string;
@@ -43,6 +46,16 @@
 </script>
 
 <Card title="Energy Flow">
+  <div class="flex">
+    <div class="flex flex-row justify-center items-center ml-1.5">
+      <div class="w-4 h-4 rounded-sm bg-green-500" />
+      <span class="text-gray-500 font-medium ml-1">Community</span>
+    </div>
+    <div class="flex flex-row justify-center items-center ml-5">
+      <div class="w-4 h-4 rounded-sm bg-black" />
+      <span class="text-gray-500 font-medium ml-1">Public Grid</span>
+    </div>
+  </div>
   <div class="flex items-center justify-center mb-12">
     <div class="flex flex-col items-center  justify-center mx-4">
       <div>
@@ -58,18 +71,11 @@
     </div>
   </div>
   <div class="flex items-center justify-center">
-    <div class="flex items-center ml-5">
-      <div class="w-4 h-4 rounded-sm bg-green-500" />
-      <span class="text-gray-500 font-medium ml-1">Community</span>
-    </div>
-    <div class="flex items-center ml-4">
-      <div class="w-4 h-4 rounded-sm bg-black" />
-      <span class="text-gray-500 font-medium ml-1">Public Grid</span>
-    </div>
     <div class="flex flex-col m-2">
       <span class="text-gray-500 text-xs font-medium">From</span>
       <input
         type="date"
+        max={endDate}
         class="input-sm mr-2 px-1 py-1"
         bind:value={startDate}
         on:change={updateChart}
@@ -77,7 +83,13 @@
     </div>
     <div class="flex flex-col m-2">
       <span class="text-gray-500 text-xs font-medium">To</span>
-      <input type="date" class="input-sm px-1 py-1" bind:value={endDate} on:change={updateChart} />
+      <input
+        type="date"
+        min={startDate}
+        class="input-sm px-1 py-1"
+        bind:value={endDate}
+        on:change={updateChart}
+      />
     </div>
   </div>
 </Card>

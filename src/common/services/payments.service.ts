@@ -1,4 +1,4 @@
-import { isSameDay } from "date-fns";
+import { isSameDay, isValid } from "date-fns";
 import { request } from "../api.util";
 
 export class PaymentsService {
@@ -180,7 +180,7 @@ export class PaymentsService {
               type === "all") &&
             i.amount > minPrice &&
             i.amount < maxPrice &&
-            (date ? isSameDay(date, new Date(i.createdAt)) : true)
+            (date && isValid(date) ? isSameDay(date, new Date(i.createdAt)) : true)
           );
         })
         .sort((i1, i2) => i2.createdAt.getTime() - i1.createdAt.getTime()),

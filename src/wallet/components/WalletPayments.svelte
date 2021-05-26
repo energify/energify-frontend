@@ -1,6 +1,5 @@
-<script>
+<script lang="ts">
   import { formatDistanceToNow } from "date-fns";
-  import { onMount } from "svelte";
   import Badge from "../../common/components/badge/Badge.svelte";
   import Table from "../../common/components/table/Table.svelte";
   import TableNotFound from "../../common/components/table/TableNotFound.svelte";
@@ -9,30 +8,21 @@
   import WalletPaymentsFilter from "./WalletPaymentsFilter.svelte";
 
   const { user } = authService;
-  let payments = paymentsService.fetchPayments();
+  let paymentsPromise = paymentsService.fetchPayments();
   const userId = 10;
 
-  function handleFilterPayments(type, minPrice, maxPrice, date) {
-    if (type === "buy") {
-      payments.data = payments.data?.filter((p) => (p.consumerId = userId));
-    } else if (type === "sell") {
-      payments.data = payments.data?.filter((p) => (p.prosumerId = userId));
-      console.log(payments);
-    } else {
-      payments = paymentsService.fetchPayments();
-    }
+  async function fetchPayments(type: string, minPrice: number, maxPrice: number, date: Date) {
+    paymentsPromise = paymentsService.fetchPayments(type, minPrice, maxPrice, date);
   }
-
-  function updatePayments() {}
 </script>
 
 <div class="flex items-center justify-between mb-6">
   <h3 class="text-gray-900 text-xl font-semibold">Latest Payments</h3>
-  <WalletPaymentsFilter onFiltered={handleFilterPayments} />
+  <WalletPaymentsFilter onFiltered={fetchPayments} />
 </div>
 
 <Table headers={["Amount", "Price", "Date", "Explore", "Invoice"]}>
-  {#await paymentsService.fetchPayments()}
+  {#await paymentsPromise}
     <TableSkeleton headersNum={5} rowsNum={5} />
   {:then { data }}
     {#if data.length === 0}

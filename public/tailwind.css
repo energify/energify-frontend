@@ -16,7 +16,7 @@
     shadow-sm placeholder-gray-400;
 }
 
-.input.sm:focus {
+.input-sm:focus {
   @apply outline-none ring-green-500 border-green-500;
 }
 

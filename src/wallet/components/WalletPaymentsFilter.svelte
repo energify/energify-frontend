@@ -1,7 +1,7 @@
 <script lang="ts">
   import Dropdown from "../../common/components/dropdown/Dropdown.svelte";
 
-  let type = "buy";
+  let type = "all";
   let minPrice = "1";
   let maxPrice = "5";
   let date;

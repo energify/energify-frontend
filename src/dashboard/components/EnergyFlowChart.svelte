@@ -43,39 +43,16 @@
 </script>
 
 <Card title="Energy Flow">
-  <span slot="action">
-    <div class="flex">
-      <div class="flex-col m-2">
-        <span class="text-gray-500 text-xs font-medium">From</span>
-        <input
-          type="date"
-          class="input-sm mr-2 px-1 py-1"
-          bind:value={startDate}
-          on:change={updateChart}
-        />
-      </div>
-      <div class="flex-col m-2">
-        <span class="text-gray-500 text-xs font-medium">To</span>
-        <input
-          type="date"
-          class="input-sm px-1 py-1"
-          bind:value={endDate}
-          on:change={updateChart}
-        />
-      </div>
-    </div>
-  </span>
-
-  <div class="flex items-center mb-8">
-    <div class="flex flex-col items-center mx-8">
+  <div class="flex items-center justify-center mb-12">
+    <div class="flex flex-col items-center  justify-center mx-4">
       <div>
-        <canvas id="chartIn" class="w-52" />
+        <canvas id="chartIn" class="w-52 lg:w-64" />
       </div>
       <span class="text-gray-900 font-medium">Consumption</span>
     </div>
-    <div class="flex flex-col items-center mx-8">
+    <div class="flex flex-col items-center justify-center mx-4">
       <div>
-        <canvas id="chartOut" class="w-52" />
+        <canvas id="chartOut" class="w-52 lg:w-64" />
       </div>
       <span class="text-gray-900 font-medium">Production</span>
     </div>
@@ -88,6 +65,19 @@
     <div class="flex items-center ml-4">
       <div class="w-4 h-4 rounded-sm bg-black" />
       <span class="text-gray-500 font-medium ml-1">Public Grid</span>
+    </div>
+    <div class="flex flex-col m-2">
+      <span class="text-gray-500 text-xs font-medium">From</span>
+      <input
+        type="date"
+        class="input-sm mr-2 px-1 py-1"
+        bind:value={startDate}
+        on:change={updateChart}
+      />
+    </div>
+    <div class="flex flex-col m-2">
+      <span class="text-gray-500 text-xs font-medium">To</span>
+      <input type="date" class="input-sm px-1 py-1" bind:value={endDate} on:change={updateChart} />
     </div>
   </div>
 </Card>

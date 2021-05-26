@@ -43,6 +43,18 @@
 </script>
 
 <Card title="Energy Flow">
+  <span slot="action">
+    <div class="flex">
+      <div class="flex items-center mr-6">
+        <div class="w-4 h-4 rounded-sm bg-green-500" />
+        <span class="text-gray-500 font-medium ml-1">Community</span>
+      </div>
+      <div class="flex items-center">
+        <div class="w-4 h-4 rounded-sm bg-black" />
+        <span class="text-gray-500 font-medium ml-1">Public Grid</span>
+      </div>
+    </div>
+  </span>
   <div class="flex items-center justify-center mb-12">
     <div class="flex flex-col items-center  justify-center mx-4">
       <div>
@@ -58,14 +70,6 @@
     </div>
   </div>
   <div class="flex items-center justify-center">
-    <div class="flex items-center ml-5">
-      <div class="w-4 h-4 rounded-sm bg-green-500" />
-      <span class="text-gray-500 font-medium ml-1">Community</span>
-    </div>
-    <div class="flex items-center ml-4">
-      <div class="w-4 h-4 rounded-sm bg-black" />
-      <span class="text-gray-500 font-medium ml-1">Public Grid</span>
-    </div>
     <div class="flex flex-col m-2">
       <span class="text-gray-500 text-xs font-medium">From</span>
       <input

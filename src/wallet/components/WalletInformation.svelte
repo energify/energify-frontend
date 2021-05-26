@@ -42,7 +42,7 @@
       text-sm my-8"
       >
         <Icon src={Exclamation} class="mr-2 w-8 h-8" />
-        This device doesn't contain your wallet private key.
+        This device doesn't contain your wallet private key. Please import it.
       </div>
     </div>
     <div class="flex items-center">

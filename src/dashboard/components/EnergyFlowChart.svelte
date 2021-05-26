@@ -74,6 +74,7 @@
       <span class="text-gray-500 text-xs font-medium">From</span>
       <input
         type="date"
+        max={endDate}
         class="input-sm mr-2 px-1 py-1"
         bind:value={startDate}
         on:change={updateChart}
@@ -81,7 +82,13 @@
     </div>
     <div class="flex flex-col m-2">
       <span class="text-gray-500 text-xs font-medium">To</span>
-      <input type="date" class="input-sm px-1 py-1" bind:value={endDate} on:change={updateChart} />
+      <input
+        type="date"
+        min={startDate}
+        class="input-sm px-1 py-1"
+        bind:value={endDate}
+        on:change={updateChart}
+      />
     </div>
   </div>
 </Card>

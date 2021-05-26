@@ -19,15 +19,25 @@ export class TransactionsService {
   }
 
   fetchEnergyFlow(start: Date, end: Date) {
-    const formatedStart = formatDate(start, "MM-dd-yyyy HH:mm:ss");
-    const formatedEnd = formatDate(end, "MM-dd-yyyy HH:mm:ss");
+    const formatedStart = formatDate(start, "MM-dd-yyyy");
+    const formatedEnd = formatDate(end, "MM-dd-yyyy");
 
+    if (formatedStart === "12-22-2020" && formatedEnd === "12-23-2020") {
+      return {
+        data: {
+          energyFromCommunity: 100,
+          energyFromPublicGrid: 20,
+          energyToCommunity: 120,
+          energyToPublicGrid: 80,
+        },
+      };
+    }
     return {
       data: {
-        energyFromCommunity: 100,
+        energyFromCommunity: 10,
         energyFromPublicGrid: 20,
-        energyToCommunity: 120,
-        energyToPublicGrid: 80,
+        energyToCommunity: 20,
+        energyToPublicGrid: 5,
       },
     };
   }

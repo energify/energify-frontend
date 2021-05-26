@@ -8,7 +8,7 @@
 
 <Shell title="Dashboard">
   <div class="grid grid-cols-12 gap-12">
-    <div class="col-span-6">
+    <div class="col-span-12 xl:col-span-6">
       <EnergyHistoryChart />
     </div>
     <div class="col-span-12 xl:col-span-6 grid grid-cols-12 gap-6">

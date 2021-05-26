@@ -9,9 +9,9 @@
 
 <div class="flex h-screen overflow-hidden">
   <Sidebar bind:this={sidebar} />
-  <main class="flex-1 focus:outline-none">
+  <main class="flex flex-col flex-1 focus:outline-none">
     <Topbar {sidebar} {title} />
-    <div class="h-full mx-auto px-4 sm:px-6 md:px-8 py-6 overflow-y-auto">
+    <div class="flex-1 px-4 md:px-8 py-6 overflow-y-auto">
       <slot />
     </div>
   </main>

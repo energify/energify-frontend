@@ -1,3 +1,4 @@
+import { isSameDay } from "date-fns";
 import { request } from "../api.util";
 
 export class PaymentsService {
@@ -7,7 +8,7 @@ export class PaymentsService {
     type: string = "all",
     minPrice: number = 0,
     maxPrice: number = 10000,
-    date: Date = new Date()
+    date?: Date
   ) {
     return {
       data: [
@@ -171,15 +172,18 @@ export class PaymentsService {
           prosumerId: 10,
           createdAt: new Date("05-01-2021 18:30"),
         },
-      ].filter((i) => {
-        return (
-          ((type === "buy" && i.consumerId === 10) ||
-            (type === "sell" && i.prosumerId === 10) ||
-            type === "all") &&
-          i.amount > minPrice &&
-          i.amount < maxPrice
-        );
-      }),
+      ]
+        .filter((i) => {
+          return (
+            ((type === "buy" && i.consumerId === 10) ||
+              (type === "sell" && i.prosumerId === 10) ||
+              type === "all") &&
+            i.amount > minPrice &&
+            i.amount < maxPrice &&
+            (date ? isSameDay(date, new Date(i.createdAt)) : true)
+          );
+        })
+        .sort((i1, i2) => i2.createdAt.getTime() - i1.createdAt.getTime()),
     };
   }
 }

@@ -9,7 +9,7 @@
 
 <div
   class="flex border-b border-gray-200 justify-between items-center 
-      bg-white mx-auto px-8 py-5"
+      bg-white mx-auto px-8 py-5 w-full"
 >
   <div class="flex items-center">
     <Icon

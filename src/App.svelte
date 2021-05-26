@@ -13,7 +13,5 @@
   });
 </script>
 
-<div>
-  <Router routes={{ ...authRoutes, ...tradingRoutes, ...walletRoutes, ...dashboardRoutes }} />
-  <NotificationManager />
-</div>
+<Router routes={{ ...authRoutes, ...tradingRoutes, ...walletRoutes, ...dashboardRoutes }} />
+<NotificationManager />

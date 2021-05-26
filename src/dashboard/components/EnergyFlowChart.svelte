@@ -55,7 +55,7 @@
       </div>
     </div>
   </span>
-  <div class="flex items-center justify-center mb-12">
+  <div class="flex items-center justify-center mb-6">
     <div class="flex flex-col items-center  justify-center mx-4">
       <div>
         <canvas id="chartIn" class="w-52 lg:w-64" />

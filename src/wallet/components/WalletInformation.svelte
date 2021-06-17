@@ -1,11 +1,27 @@
 <script lang="ts">
   import Icon, { Exclamation } from "svelte-hero-icons";
   import Card from "../../common/components/card/Card.svelte";
-  import { hederaService } from "../../common/services/services.injector";
+  import { hederaService } from "../../common/services/hedera.service";
+  import { notificationService } from "../../common/services/notifications.service";
+  import { usersService } from "../../common/services/users.service";
 
-  const { hederaAccountInfo } = hederaService;
-
+  const hederaPrivateKey = hederaService.getPrivateKey();
+  const user = usersService.getUser();
   let privateKey: string = "";
+
+  function handleImportPrivateKey() {
+    try {
+      hederaService.importPrivateKey(privateKey);
+      notificationService.push({
+        title: "Success",
+        description: "Private key imported with success",
+        type: "success",
+      });
+      hederaService.fetchBalance();
+    } catch (e) {
+      notificationService.push({ title: "Error", description: e.message, type: "error" });
+    }
+  }
 </script>
 
 <Card title="Informations">
@@ -13,19 +29,20 @@
     <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 ">
       <dt class="text-sm font-medium text-gray-500">Account Id</dt>
       <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-        0.0.00050 <!--{$hederaAccountInfo.accountId}-->
+        {$user.hederaAccountId}
       </dd>
     </div>
   </dl>
-  {#if $hederaAccountInfo.privateKey}
+  {#if $hederaPrivateKey}
     <dl class="mb-4">
       <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 ">
         <dt class="text-sm font-medium text-gray-500">Explore</dt>
         <a
           target="_blank"
-          href="https://explorer.kabuto.sh/testnet/id/{$hederaAccountInfo.accountId}"
+          href="https://explorer.kabuto.sh/testnet/id/{$user.hederaAccountId}"
           class="underline text-green-800 mt-1 text-sm sm:mt-0 sm:col-span-2"
-          >Kabuto Explorer
+        >
+          Explore
         </a>
       </div>
     </dl>
@@ -47,10 +64,7 @@
     </div>
     <div class="flex items-center">
       <input class="input mr-3" placeholder="Private key" bind:value={privateKey} />
-      <button
-        on:click={() => hederaService.importPrivateKey(privateKey)}
-        class="btn-secundary flex items-center"
-      >
+      <button on:click={handleImportPrivateKey} class="btn-secundary flex items-center">
         Import
       </button>
     </div>

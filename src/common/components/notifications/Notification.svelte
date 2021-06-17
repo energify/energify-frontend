@@ -2,14 +2,14 @@
   import { onMount } from "svelte";
   import Icon, { X, Exclamation, InformationCircle, CheckCircle } from "svelte-hero-icons";
   import type { Notification } from "../../interfaces/notifications.interfaces";
-  import { notificationsService } from "../../services/services.injector";
+  import { notificationService } from "../../services/notifications.service";
 
   export let id: number;
   export let notification: Notification;
 
   function handleClose() {
     isRendered = false;
-    setTimeout(() => notificationsService.clearByIndex(id), 100);
+    setTimeout(() => notificationService.clearByIndex(id), 100);
   }
 
   onMount(() => {

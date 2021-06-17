@@ -1,8 +1,8 @@
 <script lang="ts">
   import Icon, { ChevronDown } from "svelte-hero-icons";
 
-  export let name: string;
-  export let buttonClass: string;
+  export let name: string = "";
+  export let buttonClass: string = "";
   export let width: number = 56;
 
   let isMenuOpen = false;

@@ -1,189 +1,72 @@
-import { isSameDay, isValid } from "date-fns";
-import { request } from "../api.util";
+import { get, writable } from "svelte/store";
+import type { ApiResponse, PaginatedData } from "../interfaces/api.interfaces";
+import type { Payment } from "../interfaces/payments.interfaces";
+import { dateToQuery } from "../misc.util";
+import { apiService } from "./api.service";
+import { hederaService } from "./hedera.service";
+import { notificationService } from "./notifications.service";
+import { usersService } from "./users.service";
 
 export class PaymentsService {
-  constructor() {}
+  private payments = writable<PaginatedData<Payment>>({ data: [], count: 0 });
 
   async fetchPayments(
+    page: number = 1,
     type: string = "all",
     minPrice: number = 0,
-    maxPrice: number = 10000,
+    maxPrice: number = 5,
     date?: Date
   ) {
-    return {
-      data: [
-        {
-          id: 1,
-          amount: 1.15,
-          hederaTransactionId: "1234",
-          consumerId: 10,
-          prosumerId: 101,
-          createdAt: new Date("12-23-2020 18:30"),
-        },
-        {
-          id: 2,
-          amount: 1.25,
-          hederaTransactionId: "4312",
-          consumerId: 10,
-          prosumerId: 101,
-          createdAt: new Date("12-22-2020 12:30"),
-        },
-        {
-          id: 3,
-          amount: 1.17,
-          hederaTransactionId: "4321",
-          consumerId: 101,
-          prosumerId: 10,
-          createdAt: new Date("12-22-2020 14:30"),
-        },
-        {
-          id: 4,
-          amount: 1.21,
-          hederaTransactionId: "4213",
-          consumerId: 102,
-          prosumerId: 10,
-          createdAt: new Date("12-22-2020 19:30"),
-        },
-        {
-          id: 5,
-          amount: 1.28,
-          hederaTransactionId: "4231",
-          consumerId: 10,
-          prosumerId: 103,
-          createdAt: new Date("12-22-2020 12:30"),
-        },
-        {
-          id: 6,
-          amount: 1.35,
-          hederaTransactionId: "4831",
-          consumerId: 101,
-          prosumerId: 10,
-          createdAt: new Date("12-22-2020 20:30"),
-        },
-        {
-          id: 7,
-          amount: 1.12,
-          hederaTransactionId: "3231",
-          consumerId: 104,
-          prosumerId: 10,
-          createdAt: new Date("12-22-2020 19:30"),
-        },
-        {
-          id: 8,
-          amount: 1.28,
-          hederaTransactionId: "4131",
-          consumerId: 10,
-          prosumerId: 103,
-          createdAt: new Date("05-25-2021 14:30"),
-        },
-        {
-          id: 9,
-          amount: 1.21,
-          hederaTransactionId: "1131",
-          consumerId: 108,
-          prosumerId: 10,
-          createdAt: new Date("05-21-2021 11:00"),
-        },
-        {
-          id: 10,
-          amount: 1.09,
-          hederaTransactionId: "1111",
-          consumerId: 108,
-          prosumerId: 10,
-          createdAt: new Date("09-20-2020 19:00"),
-        },
-        {
-          id: 11,
-          amount: 1.15,
-          hederaTransactionId: "2131",
-          consumerId: 10,
-          prosumerId: 106,
-          createdAt: new Date("09-29-2020 10:00"),
-        },
-        {
-          id: 12,
-          amount: 1.29,
-          hederaTransactionId: "1331",
-          consumerId: 101,
-          prosumerId: 10,
-          createdAt: new Date("12-12-2020 18:00"),
-        },
-        {
-          id: 13,
-          amount: 1.08,
-          hederaTransactionId: "89",
-          consumerId: 107,
-          prosumerId: 10,
-          createdAt: new Date("07-12-2020 09:00"),
-        },
-        {
-          id: 14,
-          amount: 1.24,
-          hederaTransactionId: "31",
-          consumerId: 10,
-          prosumerId: 101,
-          createdAt: new Date("07-30-2020 15:00"),
-        },
-        {
-          id: 15,
-          amount: 1.18,
-          hederaTransactionId: "9131",
-          consumerId: 104,
-          prosumerId: 10,
-          createdAt: new Date("05-09-2020 13:00"),
-        },
-        {
-          id: 16,
-          amount: 1.11,
-          hederaTransactionId: "111",
-          consumerId: 10,
-          prosumerId: 103,
-          createdAt: new Date("11-24-2020 11:30"),
-        },
-        {
-          id: 17,
-          amount: 1.21,
-          hederaTransactionId: "1091",
-          consumerId: 10,
-          prosumerId: 102,
-          createdAt: new Date("12-31-2020 11:00"),
-        },
-        {
-          id: 18,
-          amount: 1.11,
-          hederaTransactionId: "1281",
-          consumerId: 108,
-          prosumerId: 10,
-          createdAt: new Date("01-12-2021 21:00"),
-        },
-        {
-          id: 19,
-          amount: 1.2,
-          hederaTransactionId: "1101",
-          consumerId: 10,
-          prosumerId: 101,
-          createdAt: new Date("03-22-2021 15:00"),
-        },
-        {
-          id: 20,
-          amount: 1.07,
-          hederaTransactionId: "1221",
-          consumerId: 108,
-          prosumerId: 10,
-          createdAt: new Date("05-01-2021 18:30"),
-        },
-      ]
-        .filter((i) => {
-          return (
-            ((type === "buy" && i.consumerId === 10) ||
-              (type === "sell" && i.prosumerId === 10) ||
-              type === "all") &&
-            i.amount > minPrice &&
-            i.amount < maxPrice &&
-            (date && isValid(date) ? isSameDay(date, new Date(i.createdAt)) : true)
-          );
-        })
-        .sort((i1, i2) => i2.createdAt.getTime() - i1.createdAt.getTime()),
-    };
+    let query = `page=${page}&type=${type}&min-price=${minPrice}&max-price=${maxPrice}`;
+
+    if (date) {
+      query += `&date=${dateToQuery(date)}`;
+    }
+
+    console.log(date);
+
+    this.payments.set(
+      await apiService.get<PaginatedData<Payment> & ApiResponse>(`/payments/?${query}`)
+    );
+  }
+
+  async pay(payment: Payment) {
+    const { hederaAccountId } = await usersService.fetchUserHederaAccountIdById(payment.prosumerId);
+    try {
+      const { status, hash } = await hederaService.transfer(
+        hederaAccountId,
+        payment.amount * 0.2 * 1000
+      );
+
+      if (status.toString() === "SUCCESS") {
+        await new Promise((resolve) => {
+          setTimeout(async () => {
+            const { error, message } = await apiService.put(`/payments/${payment._id}/complete`, {
+              hederaTransactionHash: hash,
+            });
+            if (error || message) return;
+            this.payments.update((store) => {
+              return {
+                data: store.data.map((p) =>
+                  p._id === payment._id
+                    ? { ...p, paidAt: new Date().toISOString(), hederaTransactionHash: hash }
+                    : p
+                ),
+                count: store.count,
+              };
+            });
+            resolve(null);
+          }, 5000);
+        });
+      }
+    } catch (e) {
+      throw Error(e);
+    }
+  }
+
+  getPayments() {
+    return this.payments;
   }
 }
+
+export const paymentsService = new PaymentsService();

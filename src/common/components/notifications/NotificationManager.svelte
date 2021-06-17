@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import { notificationsService } from "../../services/services.injector";
+  import { notificationService } from "../../services/notifications.service";
   import Notification from "./Notification.svelte";
 
-  const { notifications } = notificationsService;
+  const notifications = notificationService.getNotifications();
 </script>
 
 <div class="absolute top-0 right-0 mr-8">

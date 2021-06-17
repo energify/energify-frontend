@@ -1,4 +1,19 @@
-export const energyHistoryOptions = {
+export const energyBalanceDataset = [
+  {
+    fill: true,
+    borderColor: "#009669",
+    backgroundColor: "#00966922",
+    data: [1, 2, 3, 4, 5, 6],
+  },
+  {
+    fill: true,
+    borderColor: "#101827",
+    backgroundColor: "#10182722",
+    data: [1, 2, 3, 4, 5, 6],
+  },
+];
+
+export const energyBalanceOptions = {
   responsive: true,
   plugins: {
     legend: { display: false },

@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { authService, hederaService } from "../../services/services.injector";
+  import { authService } from "../../services/auth.service";
+  import { usersService } from "../../services/users.service";
   import Dropdown from "../dropdown/Dropdown.svelte";
 
-  const { user } = authService;
+  const user = usersService.getUser();
 </script>
 
 <div class="flex items-center">
@@ -12,15 +13,7 @@
     class="w-10 h-10 rounded-full  hidden md:flex"
   />
   <div class="flex flex-col mx-2">
-    <span class="text-base text-gray-900">Luís Alves</span>
-    <span class="text-sm text-gray-500">
-      {#await hederaService.fetchBalance()}
-        ...
-      {:then { hbars }}
-        75ℏ
-        <!--{hbars.toString()}-->
-      {/await}
-    </span>
+    <span class="text-base text-gray-900">{$user.name}</span>
   </div>
   <Dropdown>
     <div

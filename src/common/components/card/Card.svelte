@@ -1,5 +1,5 @@
 <script lang="ts">
-  export let title: string;
+  export let title: string = undefined;
   export let bgColor: string = "bg-white";
 </script>
 

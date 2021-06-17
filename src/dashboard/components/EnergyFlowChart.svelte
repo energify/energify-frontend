@@ -1,94 +1,65 @@
 <script lang="ts">
   import type { Chart } from "chart.js";
-  import { subDays } from "date-fns";
+  import { format, subDays } from "date-fns";
   import { onMount } from "svelte";
-  import { createChart } from "../../common/chartjs.util";
+  import { createBarChart } from "../../common/chartjs.util";
   import Card from "../../common/components/card/Card.svelte";
-  import { transactionsService } from "../../common/services/services.injector";
-  import { energyFlowOptions } from "../chart-options/energy-flow.options";
+  import { NOW_DATE } from "../../common/misc.util";
+  import { transactionsService } from "../../common/services/transactions.service";
+  import { energyFlowDataset, energyFlowOptions } from "../chart-options/energy-flow.options";
 
-  let startDate: string;
-  let endDate: string;
+  const energyFlow = transactionsService.getEnergyFlow();
+  let startDate: string = format(subDays(NOW_DATE, 7), "yyyy-MM-dd");
+  let endDate: string = format(NOW_DATE, "yyyy-MM-dd");
 
-  let chartIn: Chart;
-  let chartOut: Chart;
-  let dataset = [{ data: [3, 1], backgroundColor: ["#12B981", "#101827"] }];
-  let labels = ["Community", "Public Grid"];
+  let chart: Chart;
+  let labels = ["To Community", "To Public Grid ", "From Community", "From Public Grid"];
 
   onMount(() => {
-    const canvasIn = document.getElementById("chartIn") as HTMLCanvasElement;
-    const canvasOut = document.getElementById("chartOut") as HTMLCanvasElement;
-    chartIn = createChart(canvasIn.getContext("2d"), "pie", dataset, labels, energyFlowOptions);
-    chartOut = createChart(canvasOut.getContext("2d"), "pie", dataset, labels, energyFlowOptions);
+    const canvas = document.getElementById("chart") as HTMLCanvasElement;
+    chart = createBarChart(canvas.getContext("2d"), energyFlowDataset, labels, energyFlowOptions);
     updateChart();
   });
 
   async function updateChart() {
-    const start = new Date(startDate ?? new Date());
-    const end = new Date(endDate ?? subDays(start, 1));
-    const { data: chartInData } = await transactionsService.fetchEnergyFlow(start, end);
-    const { energyFromCommunity, energyFromPublicGrid, energyToCommunity, energyToPublicGrid } =
-      chartInData;
-    chartIn.data.datasets[0].data = [
-      Math.round((energyToCommunity / (energyToCommunity + energyToPublicGrid)) * 100),
-      Math.round((energyToPublicGrid / (energyToCommunity + energyToPublicGrid)) * 100),
+    await transactionsService.fetchEnergyFlow(new Date(startDate), new Date(endDate));
+    chart.data.datasets[0].data = [
+      $energyFlow.toCommunity ?? 0,
+      $energyFlow.toPublicGrid ?? 0,
+      $energyFlow.fromCommunity ?? 0,
+      $energyFlow.fromPublicGrid ?? 0,
     ];
-    chartIn.update();
-    chartOut.data.datasets[0].data = [
-      Math.round((energyFromCommunity / (energyFromCommunity + energyFromPublicGrid)) * 100),
-      Math.round((energyFromPublicGrid / (energyFromCommunity + energyFromPublicGrid)) * 100),
-    ];
-    chartOut.update();
+    chart.update();
   }
 </script>
 
 <Card title="Energy Flow">
   <span slot="action">
     <div class="flex">
-      <div class="flex items-center mr-6">
-        <div class="w-4 h-4 rounded-sm bg-green-500" />
-        <span class="text-gray-500 font-medium ml-1">Community</span>
+      <div class="flex flex-col mr-4">
+        <span class="text-gray-500 text-xs font-medium">From</span>
+        <input
+          type="date"
+          max={endDate}
+          class="input-sm mr-2 px-1 py-1"
+          bind:value={startDate}
+          on:change={updateChart}
+        />
       </div>
-      <div class="flex items-center">
-        <div class="w-4 h-4 rounded-sm bg-black" />
-        <span class="text-gray-500 font-medium ml-1">Public Grid</span>
+      <div class="flex flex-col">
+        <span class="text-gray-500 text-xs font-medium">To</span>
+        <input
+          type="date"
+          min={startDate}
+          class="input-sm px-1 py-1"
+          bind:value={endDate}
+          on:change={updateChart}
+        />
       </div>
     </div>
   </span>
+
   <div class="flex items-center justify-center mb-6">
-    <div class="flex flex-col items-center  justify-center mx-4">
-      <div>
-        <canvas id="chartIn" class="w-52 lg:w-64" />
-      </div>
-      <span class="text-gray-900 font-medium">Consumption</span>
-    </div>
-    <div class="flex flex-col items-center justify-center mx-4">
-      <div>
-        <canvas id="chartOut" class="w-52 lg:w-64" />
-      </div>
-      <span class="text-gray-900 font-medium">Production</span>
-    </div>
-  </div>
-  <div class="flex items-center justify-center">
-    <div class="flex flex-col m-2">
-      <span class="text-gray-500 text-xs font-medium">From</span>
-      <input
-        type="date"
-        max={endDate}
-        class="input-sm mr-2 px-1 py-1"
-        bind:value={startDate}
-        on:change={updateChart}
-      />
-    </div>
-    <div class="flex flex-col m-2">
-      <span class="text-gray-500 text-xs font-medium">To</span>
-      <input
-        type="date"
-        min={startDate}
-        class="input-sm px-1 py-1"
-        bind:value={endDate}
-        on:change={updateChart}
-      />
-    </div>
+    <canvas id="chart" width="100%" class="w-full" />
   </div>
 </Card>

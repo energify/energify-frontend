@@ -1,6 +1,6 @@
 <script lang="ts">
-  export let color: string;
-  export let isDarkMode: boolean;
+  export let color: string = "gray";
+  export let isDarkMode: boolean = false;
 </script>
 
 <span

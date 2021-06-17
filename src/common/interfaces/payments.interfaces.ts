@@ -1,8 +1,9 @@
 export interface Payment {
-  id: number;
+  _id: string;
   amount: number;
-  hederaTransactionId: string;
-  consumerId: number;
-  prosumerId: number;
-  createdAt: string;
+  hederaTransactionHash: string;
+  consumerId: string;
+  prosumerId: string;
+  issuedAt: string;
+  paidAt: string;
 }

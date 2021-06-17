@@ -1,15 +1,32 @@
 <script lang="ts">
+  import { isValid } from "date-fns";
+
   import Dropdown from "../../common/components/dropdown/Dropdown.svelte";
+  import { NOW_DATE } from "../../common/misc.util";
 
   let type = "all";
-  let minPrice = "1";
+  let minPrice = "0";
   let maxPrice = "5";
-  let date;
+  let date = "";
 
   export let onFiltered: (type: string, minPrice: number, maxPrice: number, date: Date) => void;
 
   function handleFilter() {
-    onFiltered(type, parseFloat(minPrice), parseFloat(maxPrice), new Date(date));
+    const parsedDate = new Date(date);
+    onFiltered(
+      type,
+      parseFloat(minPrice),
+      parseFloat(maxPrice),
+      isValid(parsedDate) ? parsedDate : undefined
+    );
+  }
+
+  function handleReset() {
+    type = "all";
+    minPrice = "0";
+    maxPrice = "5";
+    date = undefined;
+    handleFilter();
   }
 </script>
 
@@ -63,6 +80,9 @@
       <div class="mt-2">
         <input bind:value={date} on:change={handleFilter} class="input" type="date" />
       </div>
+    </div>
+    <div class="flex mr-8 mb-4 justify-end">
+      <button on:click={handleReset} class="">Reset</button>
     </div>
   </Dropdown>
 </div>

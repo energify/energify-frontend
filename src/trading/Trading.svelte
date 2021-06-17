@@ -1,8 +1,8 @@
 <script>
-  import Shell from "../../common/components/shell/Shell.svelte";
-  import TradingPriceHistory from "../components/TradingPriceHistory.svelte";
-  import TradingPricesLatest from "../components/TradingPricesLatest.svelte";
-  import TradingPricesSettings from "../components/TradingPricesSettings.svelte";
+  import Shell from "../common/components/shell/Shell.svelte";
+  import TradingPriceHistory from "./components/TradingPriceHistory.svelte";
+  import TradingPricesLatest from "./components/TradingPricesLatest.svelte";
+  import TradingPricesSettings from "./components/TradingPricesSettings.svelte";
 </script>
 
 <Shell title="Trading">

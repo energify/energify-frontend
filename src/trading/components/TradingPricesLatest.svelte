@@ -2,21 +2,19 @@
   import Card from "../../common/components/card/Card.svelte";
   import Icon, { ArrowUp } from "svelte-hero-icons";
   import Badge from "../../common/components/badge/Badge.svelte";
-  import { transactionsService } from "../../common/services/services.injector";
+  import { transactionsService } from "../../common/services/transactions.service";
+
+  const price = transactionsService.getPricesHistory();
 </script>
 
 <Card bgColor="bg-gray-900">
   <div class="flex justify-between items-center">
     <div class="flex flex-col">
       <span class="text-2xl font-semibold text-gray-50">
-        {#await transactionsService.fetchPriceLast24Hours()}
-          ...
-        {:then { data }}
-          $1.17<!--${data.toFixed(2)}-->
-          <span class="text-sm text-gray-400 font-normal"> / kWh</span>
-        {/await}
+        $ {($price.reduce((acc, p) => +acc + p, 0) / $price.length).toFixed(3)}
+        <span class="text-sm text-gray-400 font-normal"> / kWh</span>
       </span>
-      <span class="text-sm text-gray-400">Last 24 hours</span>
+      <span class="text-sm text-gray-400">Average Price</span>
     </div>
     <div>
       <Badge color="green" isDarkMode>

@@ -1,17 +1,16 @@
 <script lang="ts">
   import { Chart, registerables } from "chart.js";
   import { onMount } from "svelte";
-  import Router from "svelte-spa-router";
-  import authRoutes from "./auth/auth.routes";
+  import Router, { push } from "svelte-spa-router";
   import NotificationManager from "./common/components/notifications/NotificationManager.svelte";
-  import dashboardRoutes from "./dashboard/dashboard.routes";
-  import tradingRoutes from "./trading/trading.routes";
-  import walletRoutes from "./wallet/wallet.routes";
+  import { hederaService } from "./common/services/hedera.service";
+  import routes, { conditionsFailed } from "./routes";
 
   onMount(() => {
     Chart.register(...registerables);
+    hederaService.initClient();
   });
 </script>
 
-<Router routes={{ ...authRoutes, ...tradingRoutes, ...walletRoutes, ...dashboardRoutes }} />
+<Router on:conditionsFailed={conditionsFailed} routes={{ ...routes }} />
 <NotificationManager />

@@ -1,9 +1,15 @@
 import { format, subDays, subHours, subMonths, subWeeks, subYears } from "date-fns";
 
+export const NOW_DATE = new Date("01-01-2020 00:00:00");
+
 export function arrayFromRange(j, k): Array<number> {
   return Array.apply(null, Array(k - j + 1)).map(function (_, n) {
     return n + j;
   });
+}
+
+export function dateToQuery(date: Date) {
+  return format(date, "MM-dd-yyyy HH:mm:ss");
 }
 
 export function weekDayName(code: number) {
@@ -18,26 +24,29 @@ export function weekDayName(code: number) {
 
 export function intervalToChartLabel(interval: string, scale: number) {
   if (interval === "1h") {
-    const now = new Date();
-    now.setMinutes(0);
+    NOW_DATE.setMinutes(0);
     return arrayFromRange(0, scale - 1)
-      .map((_, i) => format(subHours(now, i), "HH:mm"))
+      .map((_, i) => format(subHours(NOW_DATE, i), "HH:mm"))
       .reverse();
   } else if (interval === "1d") {
     return arrayFromRange(0, scale - 1)
-      .map((_, i) => format(subDays(new Date(), i), "dd/MM"))
+      .map((_, i) => format(subDays(NOW_DATE, i), "dd/MM"))
       .reverse();
   } else if (interval === "1w") {
     return arrayFromRange(0, scale - 1)
-      .map((_, i) => format(subWeeks(new Date(), i), "dd/MM"))
+      .map((_, i) => format(subWeeks(NOW_DATE, i), "dd/MM"))
       .reverse();
   } else if (interval === "1m") {
     return arrayFromRange(0, scale - 1)
-      .map((_, i) => format(subMonths(new Date(), i), "MM/yy"))
+      .map((_, i) => format(subMonths(NOW_DATE, i), "MM/yy"))
       .reverse();
   } else {
     return arrayFromRange(0, scale - 1)
-      .map((_, i) => format(subYears(new Date(), i), "yyyy"))
+      .map((_, i) => format(subYears(NOW_DATE, i), "yyyy"))
       .reverse();
   }
+}
+
+export function i2hex(i: number) {
+  return ("0" + i.toString(16)).slice(-2);
 }

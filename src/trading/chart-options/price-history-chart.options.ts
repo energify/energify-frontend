@@ -1,4 +1,15 @@
-export const priceHistoryOptions = {
+import type { ChartOptions } from "chart.js";
+
+export const priceHistoryDataset = [
+  {
+    fill: true,
+    backgroundColor: "#00966922",
+    borderColor: "#009669",
+    data: [],
+  },
+];
+
+export const priceHistoryOptions: ChartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -14,9 +25,9 @@ export const priceHistoryOptions = {
       },
     },
     y: {
-      beginAtZero: true,
       grid: { drawBorder: false, color: "#F3F4F6" },
       ticks: {
+        stepSize: 0.001,
         font: { size: 14, family: "Inter" },
         color: "rgb(156, 163, 175)",
       },

@@ -1,21 +1,34 @@
 <script lang="ts">
-  import { push } from "svelte-spa-router";
+  import { onMount } from "svelte";
+  import Icon, { Exclamation } from "svelte-hero-icons";
 
-  import { authService } from "../../common/services/services.injector";
+  import { push } from "svelte-spa-router";
+  import Badge from "../common/components/badge/Badge.svelte";
+  import { authService } from "../common/services/auth.service";
+  import { hederaService } from "../common/services/hedera.service";
+  import { notificationService } from "../common/services/notifications.service";
 
   let registerFormData = {
     name: "",
-    birthday: "",
     email: "",
     password: "",
-    cc: "",
+    hederaAccountId: "",
   };
 
+  let mnemonic = "";
+
+  onMount(async () => {
+    mnemonic = await hederaService.generateMnemonic();
+  });
+
   async function handleRegister() {
-    try {
-      await authService.register(registerFormData);
+    const hederaAccountId = await hederaService.createAccount(mnemonic);
+    const { error, message } = await authService.register({ ...registerFormData, hederaAccountId });
+    if (error) {
+      notificationService.push({ title: "Error", description: message, type: "error" });
+    } else {
       push("/auth/login");
-    } catch {}
+    }
   }
 </script>
 
@@ -29,6 +42,16 @@
     <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
       <form class="space-y-6" on:submit|preventDefault={handleRegister}>
         <div>
+          <div
+            class="flex justify-center items-center mr-2 bg-yellow-100 text-yellow-700 rounded-md p-1"
+          >
+            <Icon src={Exclamation} class="w-12 h-12 mr-2" />
+            <span class="text-sm">
+              Recovery phrase is the only way to recover hedera wallet so that store it safely.
+            </span>
+          </div>
+        </div>
+        <div>
           <label for="name" class="block text-sm font-medium text-gray-700"> Name </label>
           <div class="mt-1">
             <input
@@ -37,20 +60,6 @@
               required
               class="input"
               bind:value={registerFormData.name}
-            />
-          </div>
-        </div>
-
-        <div>
-          <label for="birthday" class="block text-sm font-medium text-gray-700"> Birthday </label>
-          <div class="mt-1">
-            <input
-              id="birthday"
-              type="date"
-              name="birthday"
-              required
-              class="input"
-              bind:value={registerFormData.birthday}
             />
           </div>
         </div>
@@ -84,13 +93,20 @@
         </div>
 
         <div>
-          <label for="cc" class="block text-sm font-medium text-gray-700"> Citizen No </label>
-          <div class="mt-1">
-            <input id="cc" name="cc" required class="input" bind:value={registerFormData.cc} />
+          <span class="block text-sm font-medium text-gray-700">Recovery Phrase</span>
+          <div class="grid grid-cols-12 mt-2 gap-3">
+            {#each mnemonic.split(" ") as word}
+              <div
+                class="flex items-center justify-center bg-gray-100 text-gray-600 px-1 mr-4 
+                rounded-md col-span-3"
+              >
+                {word}
+              </div>
+            {/each}
           </div>
         </div>
 
-        <div>
+        <div class="mt-2">
           <button type="submit" class="w-full flex justify-center btn"> Sign up </button>
         </div>
       </form>

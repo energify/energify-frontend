@@ -1,14 +1,21 @@
 <script lang="ts">
-  import { push } from "svelte-spa-router";
-  import { authService } from "../../common/services/services.injector";
+  import { onMount } from "svelte";
 
+  import { push } from "svelte-spa-router";
+  import { authService } from "../common/services/auth.service";
+  import { notificationService } from "../common/services/notifications.service";
+  import { usersService } from "../common/services/users.service";
+
+  const user = usersService.getUser();
   let loginFormData = { email: "", password: "" };
 
   async function handleLogin() {
-    try {
-      await authService.login(loginFormData);
+    const { error, message } = await authService.login(loginFormData);
+    if (error) {
+      notificationService.push({ title: "Error", description: message, type: "error" });
+    } else {
       push("/");
-    } catch {}
+    }
   }
 </script>
 
@@ -62,8 +69,8 @@
           </div>
 
           <div class="text-sm">
-            <a href="#" class="font-medium text-green-600 hover:text-green-500">
-              Forgot your password?
+            <a href="#/auth/register" class="font-medium text-green-600 hover:text-green-500">
+              Create a new account?
             </a>
           </div>
         </div>

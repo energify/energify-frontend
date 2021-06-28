@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.input {
+  @apply appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md 
+    shadow-sm placeholder-gray-400;
+}
+
+.input:focus {
+  @apply outline-none ring-green-500 border-green-500;
+}
+
+.input-sm {
+  @apply appearance-none block w-full border border-gray-300 rounded-md 
+    shadow-sm placeholder-gray-400;
+}
+
+.input-sm:focus {
+  @apply outline-none ring-green-500 border-green-500;
+}
+
+.btn {
+  @apply py-2 px-4 border border-transparent rounded-md shadow-sm text-base font-medium text-white 
+  bg-green-600;
+}
+
+.btn-secundary {
+  @apply rounded-md border border-gray-300 shadow-sm 
+  px-4 py-2 bg-white text-sm font-medium text-gray-700;
+}
+
+.btn-secundary:hover {
+  @apply bg-gray-50;
+}
+
+.btn-secundary:focus {
+  @apply outline-none ring-2 ring-offset-2 ring-offset-gray-100 ring-green-500;
+}
+
+.btn:hover {
+  @apply bg-green-700;
+}
+
+.btn:focus {
+  @apply outline-none ring-2 ring-offset-2 ring-green-500;
+}

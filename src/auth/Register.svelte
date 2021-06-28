@@ -47,7 +47,7 @@
           >
             <Icon src={Exclamation} class="w-12 h-12 mr-2" />
             <span class="text-sm">
-              Recovery phrase is the only way to recover hedera wallet so that store it safely.
+              Recovery phrase is the only way to recover your hedera wallet so store it safely.
             </span>
           </div>
         </div>

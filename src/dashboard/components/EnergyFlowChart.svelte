@@ -9,6 +9,8 @@
   import { energyFlowDataset, energyFlowOptions } from "../chart-options/energy-flow.options";
 
   const energyFlow = transactionsService.getEnergyFlow();
+  console.log(NOW_DATE);
+  console.log();
   let startDate: string = format(subDays(NOW_DATE, 7), "yyyy-MM-dd");
   let endDate: string = format(NOW_DATE, "yyyy-MM-dd");
 

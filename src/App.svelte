@@ -5,7 +5,6 @@
   import NotificationManager from "./common/components/notifications/NotificationManager.svelte";
   import { hederaService } from "./common/services/hedera.service";
   import routes, { conditionsFailed } from "./routes";
-
   onMount(() => {
     Chart.register(...registerables);
     hederaService.initClient();
